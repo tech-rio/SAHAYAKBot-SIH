@@ -1,0 +1,19 @@
+{
+  "name": "सहकार मित्र - AI Cooperative Legal Intelligence & Governance",
+  "short_name": "सहकार मित्र",
+  "description": "Omnichannel Multilingual AI Legal Assistant & Governance Platform for Indian Cooperatives (Ministry of Cooperation, GOI)",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#0f766e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "sahayakbot_citizen_portal.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["government", "productivity", "utilities"]
+}
