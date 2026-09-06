@@ -339,6 +339,27 @@ function applyGlobalLanguage(lang) {
   const elSlipClose = document.getElementById('i18nSlipClose');
   if (elSlipClose) elSlipClose.innerText = t.slipClose;
 
+  // 1. Sync Top Dropdown
+  if (languageSelect && languageSelect.value !== lang) {
+    languageSelect.value = lang;
+  }
+
+  // 2. Sync Speech Controller Pills
+  document.querySelectorAll('.voice-lang-btn').forEach(btn => {
+    if (btn.getAttribute('data-lang') === lang) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // 3. Sync Mic Button Interactive Language Badge
+  const elMicBadge = document.getElementById('micLangBadge');
+  if (elMicBadge) {
+    const badgeMap = { 'hi-IN': 'HI', 'mr-IN': 'MR', 'gu-IN': 'GU', 'en-IN': 'EN' };
+    elMicBadge.innerText = badgeMap[lang] || 'HI';
+  }
+
   // Update Speech Model Language
   if (recognition) {
     recognition.lang = currentLanguage;
@@ -348,12 +369,135 @@ function applyGlobalLanguage(lang) {
   console.log(`[i18n] Global Language updated to: ${lang} (${langCode})`);
 }
 
+// Supported language sequence for one-tap cycle on the speech button
+const SUPPORTED_LANGS = ['hi-IN', 'mr-IN', 'gu-IN', 'en-IN'];
+
+// Setup Voice Controller Language Controls (Directly on Speech Button)
+function setupVoiceLanguageControls() {
+  // 1. Language pill buttons right above the mic
+  document.querySelectorAll('.voice-lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetLang = btn.getAttribute('data-lang');
+      applyGlobalLanguage(targetLang);
+      
+      // Audible speech confirmation in that language
+      if (targetLang === 'mr-IN') speakAnswer('मराठी भाषा निवडली आहे.', 'mr');
+      else if (targetLang === 'gu-IN') speakAnswer('ગુજરાતી ભાષા પસંદ કરવામાં આવી છે.', 'gu');
+      else if (targetLang === 'en-IN') speakAnswer('English language selected.', 'en');
+      else speakAnswer('हिन्दी भाषा चयनित की गई है।', 'hi');
+    });
+  });
+
+  // 2. Click directly on the Mic Language Badge to cycle through languages
+  const elMicBadge = document.getElementById('micLangBadge');
+  if (elMicBadge) {
+    elMicBadge.addEventListener('click', (e) => {
+      e.stopPropagation(); // prevent triggering mic push-to-talk recording
+      const currentIndex = SUPPORTED_LANGS.indexOf(currentLanguage);
+      const nextIndex = (currentIndex + 1) % SUPPORTED_LANGS.length;
+      const nextLang = SUPPORTED_LANGS[nextIndex];
+      applyGlobalLanguage(nextLang);
+
+      // Play audio confirmation of switch
+      if (nextLang === 'mr-IN') speakAnswer('मराठी भाषा', 'mr');
+      else if (nextLang === 'gu-IN') speakAnswer('ગુજરાતી ભાષા', 'gu');
+      else if (nextLang === 'en-IN') speakAnswer('English', 'en');
+      else speakAnswer('हिन्दी भाषा', 'hi');
+    });
+  }
+}
+
+// Automatic Voice Intent & Language Detection when user speaks into Mic
+function detectAndSwitchVoiceLanguage(rawTranscript) {
+  const t = rawTranscript.trim().toLowerCase();
+
+  // Pattern 1: User asks to speak in Marathi
+  if (
+    t.includes('मराठी में बोलो') || t.includes('मराठी में बताओ') ||
+    t.includes('मराठी करा') || t.includes('मराठी बोला') ||
+    t.includes('speak in marathi') || t.includes('मराठीत सांगा') ||
+    t.includes('मराठी भाषा') || t === 'मराठी'
+  ) {
+    applyGlobalLanguage('mr-IN');
+    const cleaned = t.replace(/(मराठी में बोलो|मराठी में बताओ|मराठी करा|मराठी बोला|speak in marathi|मराठीत सांगा|मराठी)/gi, '').trim();
+    if (cleaned.length > 2) {
+      handleUserQuery(cleaned);
+    } else {
+      const msg = 'होय, आता मी मराठीत बोलेन. तुमचा प्रश्न विचारा.';
+      appendMessage(msg, 'bot', null, 'भाषा बदल (Voice Switch: Marathi)', 'Voice Language Engine');
+      speakAnswer(msg, 'mr');
+    }
+    return true;
+  }
+
+  // Pattern 2: User asks to speak in Gujarati
+  if (
+    t.includes('गुजराती में बोलो') || t.includes('गुजराती में बताओ') ||
+    t.includes('ગુજરાતીમાં બોલો') || t.includes('ગુજરાતી કરો') ||
+    t.includes('speak in gujarati') || t.includes('ગુજરાતી ભાષા') || t === 'ગુજરાતી' || t === 'गुजराती'
+  ) {
+    applyGlobalLanguage('gu-IN');
+    const cleaned = t.replace(/(गुजराती में बोलो|गुजराती में बताओ|ગુજરાતીમાં બોલો|ગુજરાતી કરો|speak in gujarati|ગુજરાતી)/gi, '').trim();
+    if (cleaned.length > 2) {
+      handleUserQuery(cleaned);
+    } else {
+      const msg = 'હા, હવે હું ગુજરાતીમાં બોલીશ. તમારો પ્રશ્ન પૂછો.';
+      appendMessage(msg, 'bot', null, 'ભાષા બદલો (Voice Switch: Gujarati)', 'Voice Language Engine');
+      speakAnswer(msg, 'gu');
+    }
+    return true;
+  }
+
+  // Pattern 3: User asks to speak in English
+  if (
+    t.includes('speak in english') || t.includes('switch to english') ||
+    t.includes('in english') || t.includes('english please') ||
+    t.includes('अंग्रेजी में बोलो') || t.includes('इंग्लिश में बोलो') || t === 'english'
+  ) {
+    applyGlobalLanguage('en-IN');
+    const cleaned = t.replace(/(speak in english|switch to english|in english|english please|अंग्रेजी में बोलो|इंग्लिश में बोलो|english)/gi, '').trim();
+    if (cleaned.length > 2) {
+      handleUserQuery(cleaned);
+    } else {
+      const msg = 'Sure! I have switched to English. Please ask your question.';
+      appendMessage(msg, 'bot', null, 'Language Switch (Voice: English)', 'Voice Language Engine');
+      speakAnswer(msg, 'en');
+    }
+    return true;
+  }
+
+  // Pattern 4: User asks to speak in Hindi
+  if (
+    t.includes('हिन्दी में बोलो') || t.includes('हिंदी में बोलो') ||
+    t.includes('हिन्दी में बताओ') || t.includes('speak in hindi') || t === 'हिन्दी' || t === 'हिंदी'
+  ) {
+    applyGlobalLanguage('hi-IN');
+    const cleaned = t.replace(/(हिन्दी में बोलो|हिंदी में बोलो|हिन्दी में बताओ|speak in hindi|हिन्दी|हिंदी)/gi, '').trim();
+    if (cleaned.length > 2) {
+      handleUserQuery(cleaned);
+    } else {
+      const msg = 'जी हाँ, अब मैं हिन्दी में बात करूँगा। अपना सवाल पूछिए।';
+      appendMessage(msg, 'bot', null, 'भाषा परिवर्तन (Voice Switch: Hindi)', 'Voice Language Engine');
+      speakAnswer(msg, 'hi');
+    }
+    return true;
+  }
+
+  // Pattern 5: Auto-detect Gujarati script
+  if (/[\u0A80-\u0AFF]/.test(rawTranscript) && currentLanguage !== 'gu-IN') {
+    applyGlobalLanguage('gu-IN');
+  }
+
+  return false;
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
   await loadKnowledgeBase();
   initVoices();
   initSpeechRecognition();
   setupEventListeners();
+  setupVoiceLanguageControls();
   setupOmnichannelViews();
   setupKccCalculator();
   applyGlobalLanguage(currentLanguage);
@@ -638,7 +782,12 @@ function initSpeechRecognition() {
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
     console.log('Recognized speech:', transcript);
-    handleUserQuery(transcript);
+
+    // Automatic Voice Command & Language Switch Detection
+    const wasHandled = detectAndSwitchVoiceLanguage(transcript);
+    if (!wasHandled) {
+      handleUserQuery(transcript);
+    }
   };
 
   recognition.onerror = (event) => {

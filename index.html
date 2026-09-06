@@ -199,14 +199,33 @@
           <div class="visualizer-bar"></div>
         </div>
 
+        <!-- Quick Language Pills right above Mic Button -->
+        <div class="voice-lang-bar" id="voiceLangBar">
+          <button class="voice-lang-btn active" data-lang="hi-IN" title="हिन्दी में बोलें">
+            🇮🇳 हिन्दी
+          </button>
+          <button class="voice-lang-btn" data-lang="mr-IN" title="मराठीत बोला">
+            🇮🇳 मराठी
+          </button>
+          <button class="voice-lang-btn" data-lang="gu-IN" title="ગુજરાતીમાં બોલો">
+            🇮🇳 ગુજરાતી
+          </button>
+          <button class="voice-lang-btn" data-lang="en-IN" title="Speak in English">
+            🇬🇧 English
+          </button>
+        </div>
+
         <div class="voice-status-text" id="voiceStatus">
           बोलने के लिए माइक बटन दबाएं (Press Push-to-Talk)
         </div>
 
-        <div class="mic-button-wrapper">
+        <div class="mic-button-wrapper" style="position: relative;">
           <button id="micBtn" class="btn-push-to-talk" title="Push to Talk (बोलें)">
             <i class="fa-solid fa-microphone"></i>
           </button>
+          <div class="mic-lang-badge" id="micLangBadge" title="भाषा बदलने के लिए क्लिक करें (Tap to change language)">
+            HI
+          </div>
         </div>
 
         <!-- Text Input Fallback -->
