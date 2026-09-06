@@ -1,7 +1,7 @@
-// Service Worker for Sahakar Mitra (SIH26088)
+// Service Worker for SAHAYAKBot (SIH26088)
 // Network-First strategy ensures users always get latest UI while retaining 100% offline resilience
 
-const CACHE_NAME = 'sahakar-mitra-v2.9-live';
+const CACHE_NAME = 'sahayakbot-v3.3-clean-ui';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

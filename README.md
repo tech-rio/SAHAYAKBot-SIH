@@ -1,4 +1,4 @@
-# 🌾 सहकार मित्र (Sahakar Mitra)
+# 🌾 SAHAYAKBot (सहायक बॉट)
 ### Omnichannel Multilingual AI Legal Intelligence & Cooperative Governance Platform
 **Smart India Hackathon (SIH 2026) | Problem Statement ID: SIH26088 (Software Edition)**  
 **Ministry:** Ministry of Cooperation, Government of India  
@@ -29,8 +29,8 @@ India powers over **63,000+ Primary Agricultural Credit Societies (PACS)** and 8
 
 ---
 
-## 💡 Solution: Sahakar Mitra (सहकार मित्र)
-**Sahakar Mitra** is a voice-first, legally grounded, omnichannel software platform delivering instant legal assistance, subvention calculation, and automated grievance redressal across rural India.
+## 💡 Solution: SAHAYAKBot (सहायक बॉट)
+**SAHAYAKBot** is a voice-first, legally grounded, omnichannel software platform delivering instant legal assistance, subvention calculation, and automated grievance redressal across rural India.
 
 ### 🌟 Core Capabilities
 * 🎙️ **Voice-First Indic Interaction:** Zero typing required. Speaks and listens in **Hindi, Marathi, Gujarati, and English** with regional accent tolerance.

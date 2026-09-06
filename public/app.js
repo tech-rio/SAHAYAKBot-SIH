@@ -70,7 +70,7 @@ const logoutFarmerBtn = document.getElementById('logoutFarmerBtn');
 // Comprehensive Global UI Translations Dictionary (SIH26088 Omnichannel Platform)
 const UI_TRANSLATIONS = {
   'hi-IN': {
-    pageTitle: 'सहकार मित्र | AI Cooperative Governance & Legal Platform (SIH26088)',
+    pageTitle: 'SAHAYAKBot | AI Cooperative Governance & Legal Platform (SIH26088)',
     modeInfo: 'ऑम्नीचैनल इंटरफेस (Omnichannel Delivery):',
     btnKiosk: 'पंचायत कियोस्क (Kiosk)',
     btnPortal: 'सीएससी वेब पोर्टल (CSC Web)',
@@ -91,17 +91,19 @@ const UI_TRANSLATIONS = {
     quickSub: 'नागरिक सीधे क्लिक करके पूछ सकते हैं:',
     chips: [
       { icon: 'fa-users', label: 'PACS नया सदस्य नियम', query: 'PACS में नया सदस्य कैसे बनें?' },
-      { icon: 'fa-credit-card', label: 'KCC लोन व 4% ब्याज छूट', query: 'KCC पर 4% ब्याज और लोन के क्या नियम हैं?' },
+      { icon: 'fa-credit-card', label: 'KCC 4% ब्याज छूट', query: 'KCC पर 4% ब्याज और लोन के क्या नियम हैं?' },
       { icon: 'fa-cloud-showers-heavy', label: 'PMFBY फसल बीमा क्लेम', query: 'फसल नुकसान होने पर PMFBY में 72 घंटे में क्लेम कैसे करें?' },
-      { icon: 'fa-gavel', label: 'समिति में शिकायत व लोकपाल', query: 'सहकारी समिति में शिकायत व लोकपाल नियम क्या हैं?' },
-      { icon: 'fa-file-invoice-dollar', label: 'सहारा रिफंड प्रक्रिया', query: 'सहारा रिफंड पोर्टल पर पैसे वापस कैसे मिलेंगे?' }
+      { icon: 'fa-warehouse', label: 'अनाज भंडारण योजना', query: 'सहकारिता क्षेत्र में विश्व की सबसे बड़ी अनाज भंडारण योजना के क्या नियम व लाभ हैं?' },
+      { icon: 'fa-prescription-bottle-medical', label: 'जन औषधि केंद्र PACS', query: 'PACS में प्रधानमंत्री भारतीय जन औषधि केंद्र कैसे खोलें?' },
+      { icon: 'fa-globe', label: 'NCEL कृषि निर्यात', query: 'National Cooperative Exports Limited (NCEL) क्या है और इससे किसानों को क्या लाभ है?' },
+      { icon: 'fa-file-invoice-dollar', label: 'सहारा रिफंड ₹50,000', query: 'सहारा रिफंड पोर्टल पर ₹50,000 क्लेम की प्रक्रिया क्या है?' }
     ],
     statutoryTitle: 'वैधानिक प्राधिकार (Statutory Authority)',
     statutoryList: [
       '<strong>पैक्स:</strong> मॉडल उप-नियम 2023 (धारा 7)',
       '<strong>KCC:</strong> 4% शुद्ध दर (IS-PRI योजना)',
-      '<strong>फसल बीमा:</strong> 72-घंटे क्षति सूचना',
-      '<strong>विवाद:</strong> MSCS अधिनियम 2023 (धारा 84)',
+      '<strong>भंडारण:</strong> ₹1 लाख करोड़ पैक्स गोदाम व e-NWR',
+      '<strong>निर्यात:</strong> NCEL व BBSSL प्रमाणित बीज',
       '<strong>डेटा सुरक्षा:</strong> DPDP Act 2023 अनुपालित'
     ],
     voiceStatusReady: 'बोलने के लिए माइक बटन दबाएं (Press Push-to-Talk)',
@@ -115,7 +117,7 @@ const UI_TRANSLATIONS = {
     slipClose: 'बंद करें'
   },
   'mr-IN': {
-    pageTitle: 'सहकार मित्र | AI सहकारी सुशासन व विधिक प्लॅटफॉर्म (SIH26088)',
+    pageTitle: 'SAHAYAKBot | AI सहकारी सुशासन व विधिक प्लॅटफॉर्म (SIH26088)',
     modeInfo: 'ऑम्नीचॅनल वितरण इंटरफेस:',
     btnKiosk: 'पंचायत किऑस्क (Kiosk)',
     btnPortal: 'सीएससी वेब पोर्टल (CSC Web)',
@@ -131,22 +133,24 @@ const UI_TRANSLATIONS = {
     biometric: 'अंगठा लॉगिन (Aadhaar)',
     admin: 'प्रशासन',
     welcomeTitle: 'नमस्कार! मी SAHAYAKBot आहे.',
-    welcomeDesc: 'तुम्ही मला पॅक्स (PACS) मॉडेल उप-नियम 2023, किसान क्रेडिट कार्ड (KCC 4%), पीक विमा (PMFBY 72-तास दावा) किंवा सहकारी समिती लोकपाल संदर्भातील कोणतीही कायदेशीर माहिती बोलून किंवा लिहून विचारू शकता.',
+    welcomeDesc: 'तुम्ही मला पॅक्स (PACS) मॉडेल उप-नियम 2023, किसान क्रेडिट कार्ड (KCC 4%), पीक विमा (PMFBY 72-तास दावा), धान्य साठवणूक किंवा जन औषधी केंद्रा संदर्भातील कोणतीही कायदेशीर माहिती विचारू शकता.',
     quickTitle: 'त्वरित प्रश्न (Quick Queries)',
     quickSub: 'नागरिक थेट क्लिक करून विचारू शकतात:',
     chips: [
       { icon: 'fa-users', label: 'PACS नवीन सदस्य नियम', query: 'PACS मध्ये नवीन सदस्य कसे व्हावे?' },
       { icon: 'fa-credit-card', label: 'KCC कर्ज व 4% व्याज सवलत', query: 'KCC वर 4% व्याज आणि कर्जाचे नियम काय आहेत?' },
       { icon: 'fa-cloud-showers-heavy', label: 'PMFBY पीक विमा क्लेम', query: 'पीक नुकसान झाल्यावर PMFBY मध्ये 72 तासांत क्लेम कसा करावा?' },
-      { icon: 'fa-gavel', label: 'सहकारी तक्रार व लोकपाल', query: 'सहकारी समितीत तक्रार व लोकपाल नियम काय आहेत?' },
-      { icon: 'fa-file-invoice-dollar', label: 'सहारा रिफंड प्रक्रिया', query: 'सहारा रिफंड पोर्टलवर पैसे परत कसे मिळतील?' }
+      { icon: 'fa-warehouse', label: 'धान्य साठवणूक योजना', query: 'सहकार क्षेत्रातील धान्य साठवणूक योजनेचे नियम काय आहेत?' },
+      { icon: 'fa-prescription-bottle-medical', label: 'जन औषधी केंद्र PACS', query: 'PACS मध्ये जन औषधी केंद्र कसे सुरू करावे?' },
+      { icon: 'fa-globe', label: 'NCEL कृषी निर्यात', query: 'National Cooperative Exports Limited (NCEL) काय आहे?' },
+      { icon: 'fa-file-invoice-dollar', label: 'सहारा रिफंड ₹50,000', query: 'सहारा रिफंड पोर्टलवर ₹50,000 परत कसे मिळतील?' }
     ],
     statutoryTitle: 'वैधानिक अधिकार (Statutory Authority)',
     statutoryList: [
       '<strong>पॅक्स:</strong> मॉडेल उप-नियम 2023 (कलम 7)',
       '<strong>KCC:</strong> 4% निव्वळ दर (IS-PRI योजना)',
-      '<strong>पीक विमा:</strong> 72-तास नुकसान पूर्वसूचना',
-      '<strong>वाद निवारण:</strong> MSCS कायदा 2023 (कलम 84)',
+      '<strong>साठवणूक:</strong> ₹1 लाख कोटी गोदाम व e-NWR',
+      '<strong>निर्यात:</strong> NCEL व BBSSL प्रमाणित बियाणे',
       '<strong>माहिती सुरक्षा:</strong> DPDP कायदा 2023 नुसार'
     ],
     voiceStatusReady: 'बोलण्यासाठी माइक बटण दाबा (Press Push-to-Talk)',
@@ -160,7 +164,7 @@ const UI_TRANSLATIONS = {
     slipClose: 'बंद करा'
   },
   'gu-IN': {
-    pageTitle: 'સહકાર મિત્ર | AI સહકારી શાસન અને કાનૂની પ્લેટફોર્મ (SIH26088)',
+    pageTitle: 'SAHAYAKBot | AI સહકારી શાસન અને કાનૂની પ્લેટફોર્મ (SIH26088)',
     modeInfo: 'ઓમ્નીચેનલ ઇન્ટરફેસ (Omnichannel Delivery):',
     btnKiosk: 'પંચાયત કિયોસ્ક (Kiosk)',
     btnPortal: 'સીએસસી વેબ પોર્ટલ (CSC Web)',
@@ -176,22 +180,24 @@ const UI_TRANSLATIONS = {
     biometric: 'અંગૂઠા લૉગિન (Aadhaar)',
     admin: 'પ્રશાસક',
     welcomeTitle: 'નમસ્તે! હું SAHAYAKBot છું.',
-    welcomeDesc: 'તમે મને પેક્સ (PACS) મોડેલ પેટાનિયમો 2023, કિસાન ક્રેડિટ કાર્ડ (KCC 4%), પાક વીમો (PMFBY 72-કલાક દાવો) અથવા સહકારી લોકપાલ વિશે કોઈપણ કાનૂની માહિતી બોલીને અથવા લખીને પૂછી શકો છો.',
+    welcomeDesc: 'તમે મને પેક્સ (PACS) મોડેલ પેટાનિયમો 2023, કિસાન ક્રેડિટ કાર્ડ (KCC 4%), પાક વીમો, અનાજ સંગ્રહ યોજના અથવા જન ઔષધિ કેન્દ્ર વિશે કોઈપણ કાનૂની માહિતી પૂછી શકો છો.',
     quickTitle: 'ઝડપી પ્રશ્નો (Quick Queries)',
     quickSub: 'નાગરિકો સીધા ક્લિક કરીને પૂછી શકે છે:',
     chips: [
       { icon: 'fa-users', label: 'PACS નવા સભ્ય નિયમ', query: 'PACS માં નવા સભ્ય કેવી રીતે બનવું?' },
       { icon: 'fa-credit-card', label: 'KCC લોન અને 4% વ્યાજ રાહત', query: 'KCC પર 4% વ્યાજ અને લોનના નિયમો શું છે?' },
       { icon: 'fa-cloud-showers-heavy', label: 'PMFBY પાક વીમા ક્લેમ', query: 'પાક નુકસાન થવા પર PMFBY માં 72 કલાકમાં ક્લેમ કેવી રીતે કરવો?' },
-      { icon: 'fa-gavel', label: 'મંડળીમાં ફરિયાદ અને લોકપાલ', query: 'સહકારી મંડળીમાં ફરિયાદ અને લોકપાલના નિયમો શું છે?' },
-      { icon: 'fa-file-invoice-dollar', label: 'સહારા રિફંડ પ્રક્રિયા', query: 'સહારા રિફંડ પોર્ટલ પર નાણાં કેવી રીતે પાછા મળશે?' }
+      { icon: 'fa-warehouse', label: 'અનાજ સંગ્રહ યોજના', query: 'વિશ્વની સૌથી મોટી અનાજ સંગ્રહ યોજનાના નિયમો શું છે?' },
+      { icon: 'fa-prescription-bottle-medical', label: 'જન ઔષધિ કેન્દ્ર PACS', query: 'PACS માં જન ઔષધિ કેન્દ્ર કેવી રીતે ખોલવું?' },
+      { icon: 'fa-globe', label: 'NCEL કૃષિ નિકાસ', query: 'National Cooperative Exports Limited (NCEL) શું છે?' },
+      { icon: 'fa-file-invoice-dollar', label: 'સહારા રિફંડ ₹50,000', query: 'સહારા રિફંડ પોર્ટલ પર ₹50,000 મેળવવાની પ્રક્રિયા શું છે?' }
     ],
     statutoryTitle: 'કાનૂની સત્તા (Statutory Authority)',
     statutoryList: [
       '<strong>પેક્સ:</strong> મોડેલ પેટાનિયમ 2023 (કલમ 7)',
       '<strong>KCC:</strong> 4% શુદ્ધ દર (IS-PRI યોજના)',
-      '<strong>પાક વીમો:</strong> 72-કલાક નુકસાન સૂચના',
-      '<strong>વિવાદ:</strong> MSCS અધિનિયમ 2023 (કલમ 84)',
+      '<strong>સંગ્રહ:</strong> ₹1 લાખ કરોડ ગોદામ અને e-NWR',
+      '<strong>નિકાસ:</strong> NCEL અને BBSSL પ્રમાણિત બિયારણ',
       '<strong>ડેટા સુરક્ષા:</strong> DPDP કાયદો 2023 પાલન'
     ],
     voiceStatusReady: 'બોલવા માટે માઇક બટન દબાવો (Press Push-to-Talk)',
@@ -205,7 +211,7 @@ const UI_TRANSLATIONS = {
     slipClose: 'બંધ કરો'
   },
   'en-IN': {
-    pageTitle: 'Sahakar Mitra | AI Cooperative Governance & Legal Platform (SIH26088)',
+    pageTitle: 'SAHAYAKBot | AI Cooperative Governance & Legal Platform (SIH26088)',
     modeInfo: 'Omnichannel Delivery Modes:',
     btnKiosk: 'Panchayat Kiosk',
     btnPortal: 'CSC Web Portal',
@@ -221,22 +227,24 @@ const UI_TRANSLATIONS = {
     biometric: 'Biometric Login (Aadhaar)',
     admin: 'Admin Portal',
     welcomeTitle: 'Welcome! I am SAHAYAKBot.',
-    welcomeDesc: 'You can ask me any statutory queries regarding PACS Model Bye-Laws 2023, Kisan Credit Card (KCC 4% Subvention), PMFBY Crop Insurance (72-hr claims), or Cooperative Ombudsman by voice or text.',
+    welcomeDesc: 'You can ask me any statutory queries regarding PACS Model Bye-Laws 2023, KCC 4% Loans, Grain Storage Plan, Jan Aushadhi in PACS, or NCEL Exports by voice or text.',
     quickTitle: 'Quick Queries',
     quickSub: 'Citizens can click directly to ask:',
     chips: [
       { icon: 'fa-users', label: 'PACS Membership Rules', query: 'How to become a new PACS member?' },
       { icon: 'fa-credit-card', label: 'KCC 4% Subvention Loan', query: 'What are the rules for KCC 4% interest subvention loan?' },
-      { icon: 'fa-cloud-showers-heavy', label: 'PMFBY Crop Insurance Claim', query: 'How to claim PMFBY crop insurance within 72 hours of damage?' },
-      { icon: 'fa-gavel', label: 'Cooperative Ombudsman & Disputes', query: 'What are the grievance and Ombudsman rules in cooperative societies?' },
-      { icon: 'fa-file-invoice-dollar', label: 'CRCS Sahara Refund Process', query: 'How to get refund on the CRCS Sahara Refund Portal?' }
+      { icon: 'fa-cloud-showers-heavy', label: 'PMFBY Crop Insurance', query: 'How to claim PMFBY crop insurance within 72 hours of damage?' },
+      { icon: 'fa-warehouse', label: 'Grain Storage Plan', query: 'What are the rules of the World Largest Grain Storage Plan in Cooperatives?' },
+      { icon: 'fa-prescription-bottle-medical', label: 'Jan Aushadhi in PACS', query: 'How can PACS set up Pradhan Mantri Bhartiya Jan Aushadhi Kendras?' },
+      { icon: 'fa-globe', label: 'NCEL Agri Exports', query: 'What is National Cooperative Exports Limited (NCEL)?' },
+      { icon: 'fa-file-invoice-dollar', label: 'Sahara Refund ₹50,000', query: 'What is the process to claim refunds up to ₹50,000 on Sahara Portal?' }
     ],
     statutoryTitle: 'Statutory Authority',
     statutoryList: [
       '<strong>PACS:</strong> Model Bye-Laws 2023 (Clause 7)',
       '<strong>KCC:</strong> 4% Net Rate (IS-PRI Scheme)',
-      '<strong>Crop Insurance:</strong> 72-Hour Loss Reporting',
-      '<strong>Disputes:</strong> MSCS Act 2023 (Section 84)',
+      '<strong>Grain Storage:</strong> ₹1 Lakh Cr Godowns & e-NWR',
+      '<strong>Exports:</strong> NCEL & BBSSL Certified Seeds',
       '<strong>Data Privacy:</strong> DPDP Act 2023 Compliant'
     ],
     voiceStatusReady: 'Press mic button to speak (Push-to-Talk)',
@@ -584,7 +592,7 @@ function initVoices() {
 // Load Knowledge Base
 async function loadKnowledgeBase() {
   try {
-    const res = await fetch('knowledge_base.json');
+    const res = await fetch('knowledge_base.json?v=' + Date.now());
     const data = await res.json();
     knowledgeBase = data.faq || [];
     console.log('Knowledge Base loaded:', knowledgeBase.length, 'records');
@@ -1015,6 +1023,9 @@ async function handleUserQuery(query) {
       if (data.reply) {
         botReply = data.reply;
         sourceTag = data.source || 'LLaMA-3.2 AI';
+        if (data.matched_doc) {
+          matchedDoc = data.matched_doc;
+        }
       }
 
       // If backend detected a specific language from query:

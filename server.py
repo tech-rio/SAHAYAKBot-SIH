@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SAHAYAKBot / Sahakar Mitra - AI Cooperative Governance & Legal Platform Server (SIH26088)
+SAHAYAKBot - AI Cooperative Governance & Legal Platform Server (SIH26088)
 Integrated with:
 1. LLaMA 3.2 via NVIDIA NIM for dynamic legal reasoning with statutory citations
 2. High-Fidelity Audio TTS Server (/api/tts) for natural Indic voice output
@@ -67,7 +67,7 @@ if not NVIDIA_API_KEY:
 AI_MODEL = "meta/llama-3.2-11b-vision-instruct"
 NVIDIA_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions"
 
-SYSTEM_PROMPT = """You are 'Sahakar Mitra' (SAHAYAKBot), the official multilingual voice AI Assistant for the Ministry of Cooperation, Government of India.
+SYSTEM_PROMPT = """You are 'SAHAYAKBot' (सहायक बॉट), the official multilingual voice AI Assistant for the Ministry of Cooperation, Government of India.
 Your mission is to provide legally accurate, reliable guidance to rural farmers and cooperative members in their native spoken language (Hindi, Marathi, Gujarati, or English).
 
 MANDATORY STATUTORY CITATION RULE:
@@ -76,7 +76,17 @@ At the end of your response, ALWAYS include an official statutory reference in t
 - For KCC loans: cite "RBI/NABARD Interest Subvention Scheme (IS-PRI 4% net)"
 - For Crop Damage/Insurance: cite "PMFBY Guidelines 2020 (Clause 14.2 - 72-Hour Claim Window)"
 - For Disputes/Elections: cite "MSCS Act 2023, Section 84"
-- For Sahara Refund: cite "Supreme Court Order / CRCS Portal"
+- For Sahara Refund: cite "Supreme Court Order (WP(C) 191/2022) / CRCS Portal"
+- For NCEL Exports: cite "MSCS Act 2002 / MoC Export Policy 2023"
+- For BBSSL Seeds: cite "MSCS Act 2002 / National Seed Cooperative Directive 2023"
+- For NCOL Organic: cite "MSCS Act 2002 / National Organic Policy 2023"
+- For Grain Storage / Godowns: cite "Cabinet Resolution 2023 / Inter-Ministerial Committee (IMC) Guidelines"
+- For Jan Aushadhi Kendras: cite "MoC & Dept of Pharmaceuticals Joint Directive 2023"
+- For Micro-ATMs / Bank Mitra: cite "NABARD / MoC Financial Inclusion Guidelines 2023-24"
+- For White Revolution 2.0: cite "White Revolution 2.0 Policy 2024 (MoC & DAHD)"
+- For Model Bye-Laws 25+ activities: cite "National Model Bye-Laws for PACS 2023"
+- For PM Surya Ghar: cite "MoC & MNRE PM Surya Ghar Framework 2024"
+- For Nano Urea / Nano DAP: cite "Fertilizer Control Order 1985 & MoC Guidelines"
 
 MANDATORY LANGUAGE ADHERENCE RULE:
 - Strictly respond in the specified target language (Hindi, Marathi, Gujarati, or English).
@@ -85,6 +95,53 @@ MANDATORY LANGUAGE ADHERENCE RULE:
 - When responding in Gujarati: Output strictly in pure Gujarati (ગુજરાતી લિપિ).
 - When responding in Hindi: Output strictly in pure Hindi (हिन्दी लिपी).
 - Every explanation must be polite, direct, and structured in 3 to 4 clear bullet points."""
+
+# Load RAG Knowledge Base
+RAG_KB = []
+def load_rag_knowledge_base():
+    global RAG_KB
+    for candidate in [os.path.join(DATA_DIR, 'knowledge_base.json'), os.path.join(PUBLIC_DIR, 'knowledge_base.json')]:
+        if os.path.exists(candidate):
+            try:
+                with open(candidate, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    RAG_KB = data.get('faq', [])
+                    print(f"[RAG Engine] Successfully loaded {len(RAG_KB)} verified records from {candidate}")
+                    return
+            except Exception as e:
+                print(f"[RAG Engine] Error reading {candidate}: {e}")
+
+load_rag_knowledge_base()
+
+def retrieve_rag_context(query):
+    if not RAG_KB or not query:
+        return None, 0
+    q_lower = query.lower().strip()
+    best_doc = None
+    best_score = 0
+    
+    for item in RAG_KB:
+        score = 0
+        for kw in item.get('keywords', []):
+            if kw.lower() in q_lower:
+                score += 3
+        q_hi = item.get('question_hi', '').lower()
+        q_en = item.get('question_en', '').lower()
+        if q_hi in q_lower or q_en in q_lower:
+            score += 6
+        if q_lower in q_hi or q_lower in q_en:
+            score += 4
+        item_id = item.get('id', '').lower().replace('_', ' ')
+        if item_id in q_lower:
+            score += 4
+            
+        if score > best_score:
+            best_score = score
+            best_doc = item
+            
+    if best_doc and best_score >= 3:
+        return best_doc, best_score
+    return None, 0
 
 # SQLite Database Helper Functions
 def init_db():
@@ -274,11 +331,25 @@ def detect_query_language(text, fallback_lang="hi"):
 def query_llama_ai(user_query, lang="hi"):
     if not NVIDIA_API_KEY:
         print("[AI Error] NVIDIA_API_KEY is missing!")
-        return None, lang
+        return None, lang, None
         
     # Automatically detect actual language of the query
     detected_lang = detect_query_language(user_query, fallback_lang=lang)
     effective_lang = detected_lang or lang
+    
+    # Retrieve relevant RAG context from verified Ministry database
+    matched_doc, match_score = retrieve_rag_context(user_query)
+    rag_context = ""
+    if matched_doc:
+        print(f"[RAG Match] Query matched '{matched_doc['id']}' (score: {match_score})")
+        rag_context = (
+            f"\n\n--- OFFICIAL VERIFIED MINISTRY RAG KNOWLEDGE BASE ---\n"
+            f"Topic: {matched_doc['question_en']} / {matched_doc['question_hi']}\n"
+            f"Key Provisions (English):\n{matched_doc['answer_en']}\n"
+            f"Key Provisions (Hindi):\n{matched_doc['answer_hi']}\n"
+            f"CRITICAL INSTRUCTION: Ground your answer strictly in these verified facts. Cite the exact statutory reference given above.\n"
+            f"----------------------------------------------------------"
+        )
         
     headers = {
         "Authorization": f"Bearer {NVIDIA_API_KEY}",
@@ -301,7 +372,7 @@ def query_llama_ai(user_query, lang="hi"):
     payload = {
         "model": AI_MODEL,
         "messages": [
-            {"role": "system", "content": f"{SYSTEM_PROMPT}\n{lang_instruction}"},
+            {"role": "system", "content": f"{SYSTEM_PROMPT}\n{lang_instruction}{rag_context}"},
             {"role": "user", "content": formatted_user_content}
         ],
         "max_tokens": 350,
@@ -312,13 +383,13 @@ def query_llama_ai(user_query, lang="hi"):
         resp = requests.post(NVIDIA_ENDPOINT, headers=headers, json=payload, timeout=22)
         if resp.status_code == 200:
             content = resp.json()["choices"][0]["message"]["content"]
-            return content.strip(), effective_lang
+            return content.strip(), effective_lang, matched_doc
         else:
             print(f"NVIDIA NIM returned status {resp.status_code}: {resp.text}")
-            return None, effective_lang
+            return None, effective_lang, matched_doc
     except Exception as e:
         print("Error connecting to NVIDIA NIM:", e)
-        return None, effective_lang
+        return None, effective_lang, matched_doc
 
 class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -507,18 +578,29 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                 
                 print(f"[AI Query] User asked: '{query}' (lang={lang})")
                 
-                # Query LLaMA 3.2 AI with automatic speaker language detection
-                ai_reply, detected_lang = query_llama_ai(query, lang)
+                # Query LLaMA 3.2 AI with automatic speaker language detection & RAG grounding
+                ai_reply, detected_lang, matched_doc = query_llama_ai(query, lang)
+                
+                # If NIM fails or times out but RAG matched, direct high-fidelity fallback from Ministry KB
+                if not ai_reply and matched_doc:
+                    if detected_lang == "en":
+                        ai_reply = matched_doc["answer_en"]
+                    else:
+                        ai_reply = matched_doc["answer_hi"]
+                    source_label = f"Ministry Knowledge Base (RAG: {matched_doc['id']})"
+                else:
+                    source_label = f"LLaMA-3.2 (NVIDIA NIM + RAG: {matched_doc['id']})" if (ai_reply and matched_doc) else "LLaMA-3.2 (NVIDIA NIM)"
                 
                 # Real-time Telemetry event logging & SQLite save
                 log_telemetry_event(query, detected_lang, district, ai_reply=ai_reply or "")
                 
                 if ai_reply:
-                    print(f"[AI Response] Success from {AI_MODEL} (detected_lang={detected_lang})")
+                    print(f"[AI Response] Success from {source_label} (detected_lang={detected_lang})")
                     response_payload = {
                         "reply": ai_reply,
                         "detected_lang": detected_lang,
-                        "source": "LLaMA-3.2 (NVIDIA NIM)",
+                        "source": source_label,
+                        "matched_doc": matched_doc,
                         "telemetry_synced": True
                     }
                 else:
@@ -527,6 +609,7 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                         "reply": None,
                         "detected_lang": detected_lang,
                         "source": "fallback",
+                        "matched_doc": None,
                         "telemetry_synced": True
                     }
                 
@@ -638,7 +721,7 @@ if __name__ == '__main__':
         os.chdir(ROOT_DIR)
 
     print("=" * 70)
-    print("🌾 Sahakar Mitra - AI Cooperative Legal Intelligence & Governance Server")
+    print("🌾 SAHAYAKBot - AI Cooperative Legal Intelligence & Governance Server")
     print(f"🤖 AI Engine: LLaMA 3.2 11B (NVIDIA NIM)")
     print(f"🔊 Audio Engine: High-Fidelity Indic Multilingual TTS (/api/tts active)")
     print(f"💾 Production DB: SQLite Persistent Audit Trail ({DB_PATH})")

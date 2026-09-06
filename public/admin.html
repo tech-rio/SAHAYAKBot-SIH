@@ -502,7 +502,7 @@
         </div>
 
         <div style="margin-bottom: 14px;">
-          <div style="color: #94a3b8; font-size: 0.76rem; margin-bottom: 2px;">AI सहकार मित्र विधिक मार्गदर्शन:</div>
+          <div style="color: #94a3b8; font-size: 0.76rem; margin-bottom: 2px;">AI SAHAYAKBot विधिक मार्गदर्शन:</div>
           <div style="background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #334155; font-size: 0.8rem; color: #93c5fd; white-space: pre-line; max-height: 120px; overflow-y: auto;" id="modalAiResponse">
             मार्गदर्शन विवरण...
           </div>
@@ -711,7 +711,7 @@
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `Sahakar_Mitra_National_Grievance_Log_${Date.now()}.csv`;
+        link.download = `SAHAYAKBot_National_Grievance_Log_${Date.now()}.csv`;
         link.click();
       });
     }
