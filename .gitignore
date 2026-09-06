@@ -1,0 +1,23 @@
+# Python byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite journal / temporary files
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Environment & local secret keys
+.env
+.env.local
+
+# Logs
+*.log
+
+# Windows thumbnail caches
+Thumbs.db
+ehthumbs.db
+
+# Cloudflare Tunnel credentials / temp logs
+.cloudflared/

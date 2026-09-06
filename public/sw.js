@@ -1,7 +1,7 @@
 // Service Worker for Sahakar Mitra (SIH26088)
-// Ensures 100% offline operational resilience for rural PACS counters
+// Network-First strategy ensures users always get latest UI while retaining 100% offline resilience
 
-const CACHE_NAME = 'sahakar-mitra-v1.2';
+const CACHE_NAME = 'sahakar-mitra-v2.9-live';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -13,12 +13,6 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[ServiceWorker] Pre-caching offline legal assets');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
   self.skipWaiting();
 });
 
@@ -27,15 +21,12 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            console.log('[ServiceWorker] Removing old cache', key);
-            return caches.delete(key);
-          }
+          console.log('[ServiceWorker] Purging old cache store:', key);
+          return caches.delete(key);
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
@@ -55,22 +46,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-First strategy for static assets
+  // Network-First strategy for pages & styles: always get fresh content, fallback to cache if offline
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
         }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
         return networkResponse;
-      });
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });

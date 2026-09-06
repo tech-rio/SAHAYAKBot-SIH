@@ -1,0 +1,88 @@
+{
+  "faq": [
+    {
+      "id": "pacs_membership",
+      "keywords": [
+        "pacs", "membership", "member", "sadasya", "banne", "kaise bane", "eligibility", "join",
+        "पैक्स", "सदस्य", "सदस्यता", "समीति", "जुड़ना", "मेंबर", "हिस्सेदारी", "आवेदन", "शेयर", "खाता"
+      ],
+      "question_hi": "PACS (प्राथमिक कृषि साख समिति) में नया सदस्य कैसे बनें?",
+      "question_en": "How to become a member of PACS (Primary Agricultural Credit Society)?",
+      "answer_hi": "PACS का सदस्य बनने के लिए:\n1. आपकी आयु कम से कम 18 वर्ष होनी चाहिए और आप समिति के कार्यक्षेत्र के निवासी होने चाहिए।\n2. आपके पास कृषि भूमि या संबंधित ग्रामीण व्यवसाय (जैसे डेयरी, मत्स्य पालन) होना आवश्यक है।\n3. आपको निर्धारित आवेदन पत्र के साथ आधार कार्ड, खतौनी/जमीन के दस्तावेज और 2 पासपोर्ट फोटो जमा करने होंगे।\n4. समिति के शेयर शुल्क (आमतौर पर ₹10 से ₹100 प्रति शेयर) और प्रवेश शुल्क का भुगतान करना होगा।\nआवेदन के 15 दिनों के भीतर प्रबंधन समिति निर्णय लेती है।",
+      "answer_en": "To become a PACS member:\n1. You must be at least 18 years old and reside within the society's operational area.\n2. You must own agricultural land or engage in allied rural activities (dairy, fisheries, etc.).\n3. Submit the prescribed application along with Aadhaar, land record (Khatoni), and 2 passport photos.\n4. Pay the required share capital (usually ₹10 to ₹100 per share) and admission fee.\nThe Managing Committee reviews applications within 15 days.",
+      "category": "PACS Governance"
+    },
+    {
+      "id": "kcc_loan",
+      "keywords": [
+        "kcc", "loan", "kisan credit card", "byaj", "interest", "subvention", "rin", "paisa", "karz",
+        "केसीसी", "लोन", "ऋण", "ब्याज", "कर्ज", "किसान क्रेडिट कार्ड", "सब्सिडी", "छूट", "दर", "पैसा"
+      ],
+      "question_hi": "KCC (किसान क्रेडिट कार्ड) के तहत लोन और ब्याज दर के क्या नियम हैं?",
+      "question_en": "What are the rules and interest rates for Kisan Credit Card (KCC) loans?",
+      "answer_hi": "KCC पर कृषि ऋण के प्रमुख नियम:\n1. 3 लाख रुपये तक के फसली ऋण पर मानक ब्याज दर 7% होती है।\n2. भारत सरकार समय पर भुगतान करने वाले किसानों को 3% की अतिरिक्त ब्याज छूट (Prompt Repayment Incentive) देती है।\n3. इसलिए समय पर भुगतान करने पर शुद्ध ब्याज दर केवल 4% प्रति वर्ष रह जाती है।\n4. 1.60 लाख रुपये तक के KCC लोन के लिए किसी गारंटी (Collatral-free) की आवश्यकता नहीं होती।\nआवेदन आप अपनी नजदीकी PACS या बैंक शाखा में कर सकते हैं।",
+      "answer_en": "Key KCC loan provisions:\n1. For crop loans up to ₹3 Lakhs, standard interest rate is 7%.\n2. Government of India provides a 3% prompt repayment incentive for timely payments.\n3. Hence, the effective net interest rate becomes only 4% per annum.\n4. KCC loans up to ₹1.60 Lakhs are completely collateral-free.\nYou can apply via your local PACS or participating bank branch.",
+      "category": "Credit & Finance"
+    },
+    {
+      "id": "pmfby_claim",
+      "keywords": [
+        "fasal bima", "pmfby", "crop insurance", "claim", "nuksan", "barish", "sukha", "olavrishti",
+        "फसल", "बीमा", "फसल बीमा", "नुकसान", "क्लेम", "ओलावृष्टि", "बारिश", "सूखा", "बाढ़", "मुआवजा", "क्षति"
+      ],
+      "question_hi": "प्रधानमंत्री फसल बीमा योजना (PMFBY) के तहत नुकसान होने पर क्लेम कैसे करें?",
+      "question_en": "How to claim insurance under PMFBY if crops are damaged?",
+      "answer_hi": "फसल नुकसान होने पर क्लेम की प्रक्रिया:\n1. ओलावृष्टि, जलभराव या प्राकृतिक आपदा के 72 घंटे के भीतर नुकसान की सूचना देनी अनिवार्य है।\n2. सूचना आप 'Crop Insurance App', राष्ट्रीय टोल-फ्री नंबर 14447, या अपनी PACS शाखा/कृषि अधिकारी को दे सकते हैं।\n3. सूचना मिलने पर 48 घंटे के भीतर सर्वेक्षक नियुक्त किया जाता है और 10 दिनों में नुकसान का आकलन होता है।\n4. क्लेम राशि सीधे आपके आधार से जुड़े बैंक खाते (DBT) में भेजी जाती है।",
+      "answer_en": "PMFBY Claim Process:\n1. You must report crop damage within 72 hours of localized disasters (hailstorm, flood, drought).\n2. Intimation can be logged via 'Crop Insurance App', national toll-free number 14447, or your local PACS/agriculture officer.\n3. A surveyor is appointed within 48 hours and damage assessment finishes within 10 days.\n4. Approved claim amount is credited directly to your Aadhaar-linked bank account (DBT).",
+      "category": "Schemes"
+    },
+    {
+      "id": "cooperative_complaint",
+      "keywords": [
+        "shikayat", "complaint", "grievance", "fraud", "scam", "dhokhadhadi", "dispute", "vivad", "crcs", "ombudsman",
+        "शिकायत", "विवाद", "गड़बड़ी", "घोटाला", "धोखाधड़ी", "लोकपाल", "रजिस्ट्रार", "निबंधक", "समस्या"
+      ],
+      "question_hi": "सहकारी समिति में अनियमितता या विवाद होने पर शिकायत कहां करें?",
+      "question_en": "Where to file a complaint against irregularities or disputes in a cooperative society?",
+      "answer_hi": "शिकायत और विवाद निवारण तंत्र:\n1. प्राथमिक स्तर पर: समिति के अध्यक्ष/सचिव या उप-निबंधक (ARCS / Sub-Registrar) को लिखित शिकायत दें।\n2. मल्टी-स्टेट कोऑपरेटिव सोसाइटी (MSCS) के लिए: केंद्रीय सहकारी निबंधक (CRCS) के ऑनलाइन पोर्टल (crcs.gov.in) पर शिकायत दर्ज करें।\n3. MSCS संशोधन अधिनियम 2023 के तहत 'Cooperative Ombudsman' (सहकारी लोकपाल) का गठन किया गया है, जो 30 दिनों में जांच शुरू करता है।\n4. वित्तीय गबन होने पर सहकारिता विभाग के विजिलेंस सेल को सूचित किया जा सकता है।",
+      "answer_en": "Grievance Redressal Mechanism:\n1. Primary Level: Submit written grievance to Society Secretary/Chairman or Assistant Registrar (ARCS).\n2. For Multi-State Societies: File complaints on the CRCS online grievance portal (crcs.gov.in).\n3. Under MSCS Amendment Act 2023, a 'Cooperative Ombudsman' is instituted for structured dispute resolution within 30 days.\n4. Financial misappropriations can be escalated directly to the State Cooperative Vigilance Cell.",
+      "category": "Legal & Governance"
+    },
+    {
+      "id": "pacs_computerization",
+      "keywords": [
+        "computerization", "csc", "digital", "pacs digital", "common service center", "sewa", "erp",
+        "कंप्यूटरीकरण", "डिजिटल", "सीएससी", "सेवाएं", "ईआरपी", "ऑनलाइन"
+      ],
+      "question_hi": "PACS के डिजिटलाइजेशन और कॉमन सर्विस सेंटर (CSC) सेवाओं का क्या फायदा है?",
+      "question_en": "What are the benefits of PACS computerization and CSC integration?",
+      "answer_hi": "PACS डिजिटलाइजेशन के मुख्य लाभ:\n1. 63,000+ पैक्स का राष्ट्रीय स्तर पर केंद्रीकृत ERP सॉफ्टवेयर पर कंप्यूटरीकरण किया जा रहा है।\n2. अब PACS केवल ऋण तक सीमित नहीं हैं; वे CSC बनकर 300+ ई-सेवाएं (आधार, बिल भुगतान, रेल टिकट, पैन कार्ड) दे रहे हैं।\n3. सदस्य ऑनलाइन अपना लोन स्टेटस, खाद-बीज स्टॉक और जमा राशि देख सकते हैं।\n4. समिति में पारदर्शिता आती है और ऑडिटिंग रियल-टाइम में संभव होती है।",
+      "answer_en": "Key Benefits of PACS Digitalization:\n1. Over 63,000 PACS are being digitized on a unified national ERP software platform.\n2. PACS now function as Common Service Centers (CSCs) providing 300+ government and e-services (Aadhaar, utility bills, train tickets, banking).\n3. Members get digital passbooks to track loans, fertilizer inventory, and savings transparently.\n4. Real-time accounting and audit eliminates fraud and operational delays.",
+      "category": "PACS Governance"
+    },
+    {
+      "id": "cooperative_election",
+      "keywords": [
+        "election", "chunav", "matdan", "voting", "director", "board", "adhyaksh",
+        "चुनाव", "मतदान", "अध्यक्ष", "बोर्ड", "निदेशक", "वोट", "कार्यकाल"
+      ],
+      "question_hi": "सहकारी समिति के बोर्ड और अध्यक्ष का चुनाव कैसे होता है?",
+      "question_en": "How are cooperative society board elections conducted?",
+      "answer_hi": "सहकारी समिति चुनाव नियम:\n1. बोर्ड का कार्यकाल 5 वर्ष का होता है। कार्यकाल समाप्त होने से पूर्व चुनाव कराना अनिवार्य है।\n2. MSCS अधिनियम के तहत स्वतंत्र 'Cooperative Election Authority' (सहकारी निर्वाचन प्राधिकरण) चुनाव कराती है।\n3. केवल सक्रिय सदस्य (जिन्होंने न्यूनतम निर्धारित लेनदेन किया हो और बैठकों में भाग लिया हो) ही मतदान कर सकते हैं।\n4. बोर्ड में महिला सदस्यों (कम से कम 2) और SC/ST प्रतिनिधियों के लिए आरक्षण का वैधानिक प्रावधान है।",
+      "answer_en": "Cooperative Society Election Rules:\n1. Board tenure is strictly 5 years. Elections must be completed before term expiry.\n2. Under the MSCS Act, an autonomous 'Cooperative Election Authority' supervises fair elections.\n3. Only active members (fulfilling minimum transaction and meeting attendance criteria) hold voting rights.\n4. Mandatory reservation exists for women (minimum 2 seats) and SC/ST representation on the board.",
+      "category": "Legal & Governance"
+    },
+    {
+      "id": "sahara_refund",
+      "keywords": [
+        "sahara", "refund", "crcs refund", "jama paisa", "portal",
+        "सहारा", "रिफंड", "पैसा", "वापस", "पोर्टल", "क्लेम"
+      ],
+      "question_hi": "सहारा रिफंड पोर्टल (CRCS Sahara Portal) पर फंसा पैसा वापस पाने की प्रक्रिया क्या है?",
+      "question_en": "What is the process to claim refunds on the CRCS Sahara Refund Portal?",
+      "answer_hi": "सहारा रिफंड प्रक्रिया:\n1. आधिकारिक पोर्टल mocrefund.crcs.gov.in पर जाएं।\n2. आधार नंबर और उससे लिंक मोबाइल नंबर से पंजीकरण करें।\n3. जमा प्रमाण पत्र (Certificate / Passbook) और सदस्यता संख्या अपलोड करें।\n4. क्लेम फॉर्म डाउनलोड कर हस्ताक्षर करें और दोबारा पोर्टल पर अपलोड करें।\n5. सत्यापन के बाद 45 दिनों में स्वीकृत राशि सीधे आधार-सीडेड बैंक खाते में भेजी जाती है।",
+      "answer_en": "Sahara Refund Claim Process:\n1. Visit the official portal: mocrefund.crcs.gov.in.\n2. Register using Aadhaar and Aadhaar-linked mobile number.\n3. Upload deposit passbook/certificate and membership details.\n4. Download generated claim form, sign it, and upload back to the portal.\n5. Upon verification, the disbursed amount is credited directly to Aadhaar-linked bank account within 45 days.",
+      "category": "Grievances"
+    }
+  ]
+}

@@ -9,10 +9,14 @@ let geminiApiKey = localStorage.getItem('sahakar_gemini_key') || '';
 let availableVoices = [];
 let hindiVoice = null;
 let currentAudio = null;
+let isVoicePlaying = false;
+let voiceSessionId = 0;
+let activeSpeechBubbleBtn = null;
 
 // DOM Elements
 const chatContainer = document.getElementById('chatContainer');
 const micBtn = document.getElementById('micBtn');
+const stopVoiceBtn = document.getElementById('stopVoiceBtn');
 const textInput = document.getElementById('textInput');
 const sendBtn = document.getElementById('sendBtn');
 const voiceStatus = document.getElementById('voiceStatus');
@@ -105,6 +109,7 @@ const UI_TRANSLATIONS = {
     voiceStatusProcessing: 'उत्तर तैयार कर रहा हूँ... (Processing...)',
     inputPlaceholder: 'या यहाँ अपना सवाल टाइप करें...',
     sendBtn: 'पूछें',
+    stopVoiceBtn: 'रोकें',
     slipPrint: 'प्रिंट / PDF सेव करें',
     slipWa: 'WhatsApp',
     slipClose: 'बंद करें'
@@ -149,6 +154,7 @@ const UI_TRANSLATIONS = {
     voiceStatusProcessing: 'कायदेशीर मार्गदर्शन शोधत आहे...',
     inputPlaceholder: 'किंवा येथे आपला प्रश्न टाईप करा...',
     sendBtn: 'विचारा',
+    stopVoiceBtn: 'थांबवा',
     slipPrint: 'प्रिंट / PDF जतन करा',
     slipWa: 'WhatsApp',
     slipClose: 'बंद करा'
@@ -193,6 +199,7 @@ const UI_TRANSLATIONS = {
     voiceStatusProcessing: 'કાનૂની માર્ગદર્શન મેળવી રહ્યો છું...',
     inputPlaceholder: 'અથવા અહીં તમારો પ્રશ્ન ટાઈપ કરો...',
     sendBtn: 'પૂછો',
+    stopVoiceBtn: 'અટકાવો',
     slipPrint: 'પ્રિન્ટ / PDF સાચવો',
     slipWa: 'WhatsApp',
     slipClose: 'બંધ કરો'
@@ -237,6 +244,7 @@ const UI_TRANSLATIONS = {
     voiceStatusProcessing: 'Retrieving statutory guidance...',
     inputPlaceholder: 'Or type your query here...',
     sendBtn: 'Send',
+    stopVoiceBtn: 'Stop',
     slipPrint: 'Print / Save PDF',
     slipWa: 'WhatsApp',
     slipClose: 'Close'
@@ -304,7 +312,7 @@ function applyGlobalLanguage(lang) {
     chipsContainer.innerHTML = '';
     t.chips.forEach(chip => {
       const btn = document.createElement('button');
-      btn.className = 'scenario-chip';
+      btn.className = 'topic-card-btn';
       btn.setAttribute('data-query', chip.query);
       btn.innerHTML = `<i class="fa-solid ${chip.icon}"></i> <span>${chip.label}</span>`;
       btn.addEventListener('click', () => handleUserQuery(chip.query));
@@ -314,14 +322,14 @@ function applyGlobalLanguage(lang) {
 
   // Update Statutory Authority Card
   const elStatutoryTitle = document.getElementById('i18nStatutoryTitle');
-  if (elStatutoryTitle) elStatutoryTitle.innerHTML = '<i class="fa-solid fa-shield-halved" style="color: #14b8a6;"></i> ' + t.statutoryTitle;
+  if (elStatutoryTitle) elStatutoryTitle.innerHTML = '<i class="fa-solid fa-scale-balanced" style="color: #1a365d;"></i> ' + t.statutoryTitle;
 
   const statList = document.getElementById('statutoryList');
   if (statList && t.statutoryList) {
     statList.innerHTML = '';
     t.statutoryList.forEach(item => {
       const li = document.createElement('li');
-      li.innerHTML = `<i class="fa-solid fa-check" style="color: #10b981;"></i> ${item}`;
+      li.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #15803d;"></i> ${item}`;
       statList.appendChild(li);
     });
   }
@@ -330,6 +338,8 @@ function applyGlobalLanguage(lang) {
   if (textInput) textInput.placeholder = t.inputPlaceholder;
   const elSendBtn = document.getElementById('i18nSendBtn');
   if (elSendBtn) elSendBtn.innerText = t.sendBtn;
+  const elStopVoice = document.getElementById('i18nStopVoice');
+  if (elStopVoice) elStopVoice.innerText = t.stopVoiceBtn || 'रोकें';
 
   // Update Slip Modal buttons
   const elSlipPrint = document.getElementById('i18nSlipPrint');
@@ -407,85 +417,130 @@ function setupVoiceLanguageControls() {
   }
 }
 
+// Automatic Spoken Language Identification (LID) for Speaker Detection
+function detectSpokenLanguage(rawTranscript) {
+  if (!rawTranscript) return null;
+  const t = rawTranscript.trim().toLowerCase();
+
+  // Pattern 1: Explicit voice switch commands
+  if (
+    t.includes('मराठीत') || t.includes('मराठी बोला') || t.includes('मराठी करा') || 
+    t.includes('मराठी में बोलो') || t.includes('मराठी में बताओ') || t.includes('speak in marathi') ||
+    t === 'मराठी' || t.includes('मराठी भाषा')
+  ) {
+    return 'mr-IN';
+  }
+  if (
+    t.includes('ગુજરાતીમાં') || t.includes('ગુજરાતી બોલો') || t.includes('ગુજરાતી કરો') ||
+    t.includes('गुजराती में बोलो') || t.includes('गुजराती में बताओ') || t.includes('speak in gujarati') ||
+    t === 'ગુજરાતી' || t === 'गुजराती' || t.includes('ગુજરાતી ભાષા')
+  ) {
+    return 'gu-IN';
+  }
+  if (
+    t.includes('speak in english') || t.includes('switch to english') || t.includes('in english') || 
+    t.includes('english please') || t.includes('अंग्रेजी में बोलो') || t.includes('इंग्लिश में बोलो') ||
+    t === 'english' || t === 'अंग्रेजी'
+  ) {
+    return 'en-IN';
+  }
+  if (
+    t.includes('हिन्दी में बोलो') || t.includes('हिंदी में बोलो') || t.includes('हिन्दी में बताओ') || 
+    t.includes('speak in hindi') || t === 'हिन्दी' || t === 'हिंदी' || t.includes('हिन्दी भाषा')
+  ) {
+    return 'hi-IN';
+  }
+
+  // Pattern 2: Gujarati Unicode block (U+0A80 to U+0AFF)
+  if (/[\u0A80-\u0AFF]/.test(rawTranscript)) {
+    return 'gu-IN';
+  }
+
+  // Pattern 3: English / Latin alphabet dominance
+  const latinMatches = rawTranscript.match(/[a-zA-Z]/g);
+  const devanagariMatches = rawTranscript.match(/[\u0900-\u097F]/g);
+  const latinCount = latinMatches ? latinMatches.length : 0;
+  const devCount = devanagariMatches ? devanagariMatches.length : 0;
+
+  if (latinCount > 6 && latinCount > devCount) {
+    return 'en-IN';
+  }
+
+  // Pattern 4: Marathi vs Hindi in Devanagari script
+  if (devCount > 0) {
+    const marathiTokens = [
+      'आहे', 'आहेत', 'नाही', 'नाहीत', 'कसे', 'काय', 'करायचे', 'करायचा', 'करावे',
+      'सांगा', 'मिळेल', 'मिळतात', 'मिळणार', 'पाहिजे', 'पाहिजेत', 'होय', 'शेतकरी',
+      'पिक', 'कर्ज', 'अर्ज', 'माहिती', 'पॅक्स', 'मदत', 'द्या', 'सांग', 'कोणते',
+      'कोणती', 'कधी', 'कसं', 'कुठे', 'झाले', 'झाली', 'दिले', 'केले', 'सभासद',
+      'सभासदत्व', 'गावातील', 'माझे', 'माझ्या', 'आमच्या', 'घ्यायचे', 'हवे', 'लागतील',
+      'करावी', 'पावती', 'तक्रार', 'विचारा', 'बोला', 'मला'
+    ];
+    const hindiTokens = [
+      'है', 'हैं', 'होगा', 'होगी', 'कैसे', 'क्या', 'क्यों', 'कहाँ', 'बताओ',
+      'बताइए', 'मिलेगा', 'मिलेगी', 'चाहिए', 'करना', 'करूँ', 'सकते', 'सकता',
+      'हूँ', 'मुझे', 'मेरा', 'मेरी', 'हमारे', 'नियम', 'दीजिए', 'बोलिए'
+    ];
+
+    let mScore = 0;
+    let hScore = 0;
+
+    for (const token of marathiTokens) {
+      if (t.includes(token)) mScore += 2;
+    }
+    for (const token of hindiTokens) {
+      if (t.includes(token)) hScore += 2;
+    }
+
+    if (mScore > hScore && mScore > 0) {
+      return 'mr-IN';
+    } else if (hScore > mScore && hScore > 0) {
+      return 'hi-IN';
+    }
+  }
+
+  return null;
+}
+
 // Automatic Voice Intent & Language Detection when user speaks into Mic
 function detectAndSwitchVoiceLanguage(rawTranscript) {
   const t = rawTranscript.trim().toLowerCase();
 
-  // Pattern 1: User asks to speak in Marathi
-  if (
-    t.includes('मराठी में बोलो') || t.includes('मराठी में बताओ') ||
-    t.includes('मराठी करा') || t.includes('मराठी बोला') ||
-    t.includes('speak in marathi') || t.includes('मराठीत सांगा') ||
-    t.includes('मराठी भाषा') || t === 'मराठी'
-  ) {
+  // Handle explicit switch phrases without query
+  if (t === 'मराठी' || t === 'मराठी भाषा' || t === 'मराठीत बोला' || t === 'मराठी में बोलो') {
     applyGlobalLanguage('mr-IN');
-    const cleaned = t.replace(/(मराठी में बोलो|मराठी में बताओ|मराठी करा|मराठी बोला|speak in marathi|मराठीत सांगा|मराठी)/gi, '').trim();
-    if (cleaned.length > 2) {
-      handleUserQuery(cleaned);
-    } else {
-      const msg = 'होय, आता मी मराठीत बोलेन. तुमचा प्रश्न विचारा.';
-      appendMessage(msg, 'bot', null, 'भाषा बदल (Voice Switch: Marathi)', 'Voice Language Engine');
-      speakAnswer(msg, 'mr');
-    }
+    const msg = 'होय, आता मी मराठीत बोलेन. तुमचा प्रश्न विचारा.';
+    appendMessage(msg, 'bot', null, 'भाषा बदल (Voice Switch: Marathi)', 'Voice Language Engine');
+    speakAnswer(msg, 'mr');
     return true;
   }
-
-  // Pattern 2: User asks to speak in Gujarati
-  if (
-    t.includes('गुजराती में बोलो') || t.includes('गुजराती में बताओ') ||
-    t.includes('ગુજરાતીમાં બોલો') || t.includes('ગુજરાતી કરો') ||
-    t.includes('speak in gujarati') || t.includes('ગુજરાતી ભાષા') || t === 'ગુજરાતી' || t === 'गुजराती'
-  ) {
+  if (t === 'ગુજરાતી' || t === 'गुजराती' || t === 'ગુજરાતીમાં બોલો' || t === 'गुजराती में बोलो') {
     applyGlobalLanguage('gu-IN');
-    const cleaned = t.replace(/(गुजराती में बोलो|गुजराती में बताओ|ગુજરાતીમાં બોલો|ગુજરાતી કરો|speak in gujarati|ગુજરાતી)/gi, '').trim();
-    if (cleaned.length > 2) {
-      handleUserQuery(cleaned);
-    } else {
-      const msg = 'હા, હવે હું ગુજરાતીમાં બોલીશ. તમારો પ્રશ્ન પૂછો.';
-      appendMessage(msg, 'bot', null, 'ભાષા બદલો (Voice Switch: Gujarati)', 'Voice Language Engine');
-      speakAnswer(msg, 'gu');
-    }
+    const msg = 'હા, હવે હું ગુજરાતીમાં બોલીશ. તમારો પ્રશ્ન પૂછો.';
+    appendMessage(msg, 'bot', null, 'ભાષા બદલો (Voice Switch: Gujarati)', 'Voice Language Engine');
+    speakAnswer(msg, 'gu');
     return true;
   }
-
-  // Pattern 3: User asks to speak in English
-  if (
-    t.includes('speak in english') || t.includes('switch to english') ||
-    t.includes('in english') || t.includes('english please') ||
-    t.includes('अंग्रेजी में बोलो') || t.includes('इंग्लिश में बोलो') || t === 'english'
-  ) {
+  if (t === 'english' || t === 'अंग्रेजी' || t === 'speak in english') {
     applyGlobalLanguage('en-IN');
-    const cleaned = t.replace(/(speak in english|switch to english|in english|english please|अंग्रेजी में बोलो|इंग्लिश में बोलो|english)/gi, '').trim();
-    if (cleaned.length > 2) {
-      handleUserQuery(cleaned);
-    } else {
-      const msg = 'Sure! I have switched to English. Please ask your question.';
-      appendMessage(msg, 'bot', null, 'Language Switch (Voice: English)', 'Voice Language Engine');
-      speakAnswer(msg, 'en');
-    }
+    const msg = 'Sure! I have switched to English. Please ask your question.';
+    appendMessage(msg, 'bot', null, 'Language Switch (Voice: English)', 'Voice Language Engine');
+    speakAnswer(msg, 'en');
     return true;
   }
-
-  // Pattern 4: User asks to speak in Hindi
-  if (
-    t.includes('हिन्दी में बोलो') || t.includes('हिंदी में बोलो') ||
-    t.includes('हिन्दी में बताओ') || t.includes('speak in hindi') || t === 'हिन्दी' || t === 'हिंदी'
-  ) {
+  if (t === 'हिन्दी' || t === 'हिंदी' || t === 'हिन्दी में बोलो') {
     applyGlobalLanguage('hi-IN');
-    const cleaned = t.replace(/(हिन्दी में बोलो|हिंदी में बोलो|हिन्दी में बताओ|speak in hindi|हिन्दी|हिंदी)/gi, '').trim();
-    if (cleaned.length > 2) {
-      handleUserQuery(cleaned);
-    } else {
-      const msg = 'जी हाँ, अब मैं हिन्दी में बात करूँगा। अपना सवाल पूछिए।';
-      appendMessage(msg, 'bot', null, 'भाषा परिवर्तन (Voice Switch: Hindi)', 'Voice Language Engine');
-      speakAnswer(msg, 'hi');
-    }
+    const msg = 'जी हाँ, अब मैं हिन्दी में बात करूँगा। अपना सवाल पूछिए।';
+    appendMessage(msg, 'bot', null, 'भाषा परिवर्तन (Voice Switch: Hindi)', 'Voice Language Engine');
+    speakAnswer(msg, 'hi');
     return true;
   }
 
-  // Pattern 5: Auto-detect Gujarati script
-  if (/[\u0A80-\u0AFF]/.test(rawTranscript) && currentLanguage !== 'gu-IN') {
-    applyGlobalLanguage('gu-IN');
+  // Automatic spoken language detection from speaker query
+  const detectedLang = detectSpokenLanguage(rawTranscript);
+  if (detectedLang && detectedLang !== currentLanguage) {
+    console.log(`[Speaker Auto-Switch] Detected language '${detectedLang}' from speaker transcript.`);
+    applyGlobalLanguage(detectedLang);
   }
 
   return false;
@@ -547,16 +602,24 @@ function setupOmnichannelViews() {
       if (b) b.classList.remove('active');
     });
 
-    kioskWrapper.classList.remove('view-mobile', 'view-portal', 'fullscreen-mode');
+    if (kioskWrapper) {
+      kioskWrapper.classList.remove('view-mobile', 'view-portal');
+    }
+    document.body.classList.remove('preview-mobile', 'preview-portal');
 
     if (mode === 'mobile') {
-      kioskWrapper.classList.add('view-mobile');
+      if (isCurrentlyFullscreen() && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      if (kioskWrapper) kioskWrapper.classList.add('view-mobile');
+      document.body.classList.add('preview-mobile');
       if (btnModeMobile) btnModeMobile.classList.add('active');
     } else if (mode === 'portal') {
-      kioskWrapper.classList.add('view-portal');
+      if (isCurrentlyFullscreen() && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      if (kioskWrapper) kioskWrapper.classList.add('view-portal');
+      document.body.classList.add('preview-portal');
       if (btnModePortal) btnModePortal.classList.add('active');
     } else {
       if (btnModeKiosk) btnModeKiosk.classList.add('active');
+      if (!isCurrentlyFullscreen()) toggleFullScreen();
     }
   }
 
@@ -650,21 +713,38 @@ function setupEventListeners() {
     });
   }
 
+  // Stop Voice Trigger Button Listener
+  if (stopVoiceBtn) {
+    stopVoiceBtn.addEventListener('click', stopVoice);
+  }
+
   // Kiosk Fullscreen toggle
-  toggleFullscreenBtn.addEventListener('click', () => {
-    kioskWrapper.classList.toggle('fullscreen-mode');
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
+  if (toggleFullscreenBtn) {
+    toggleFullscreenBtn.addEventListener('click', toggleFullScreen);
+  }
+
+  // Global Escape Key Listener: Stop active voice and close modals
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (isVoicePlaying) stopVoice();
+      if (receiptModal && receiptModal.classList.contains('open')) receiptModal.classList.remove('open');
+      if (kccCalcModal && kccCalcModal.classList.contains('open')) kccCalcModal.classList.remove('open');
+      if (settingsModal && settingsModal.classList.contains('open')) settingsModal.classList.remove('open');
+      if (biometricModal && biometricModal.classList.contains('open')) biometricModal.classList.remove('open');
     }
   });
 
+  // Native Fullscreen state change events
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+  document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+  document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
   // Scenario chips
-  document.querySelectorAll('.scenario-chip').forEach(btn => {
+  document.querySelectorAll('.scenario-chip, .topic-card-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const query = btn.getAttribute('data-query');
-      handleUserQuery(query);
+      if (query) handleUserQuery(query);
     });
   });
 
@@ -758,6 +838,63 @@ function setupEventListeners() {
   }
 }
 
+// Proper HTML5 Native Browser Fullscreen Controller (F11 Full Monitor Experience)
+function isCurrentlyFullscreen() {
+  return !!(
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement
+  );
+}
+
+function handleFullscreenChange() {
+  const isFs = isCurrentlyFullscreen();
+
+  if (toggleFullscreenBtn) {
+    toggleFullscreenBtn.classList.toggle('active', isFs);
+    const icon = toggleFullscreenBtn.querySelector('i');
+    if (icon) {
+      icon.className = isFs ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+      toggleFullscreenBtn.setAttribute('title', isFs ? 'पूर्ण स्क्रीन से बाहर निकलें (Exit Fullscreen - Esc)' : 'पूर्ण स्क्रीन (Fullscreen)');
+    }
+  }
+
+  const badge = document.getElementById('fullscreenActiveBadge');
+  if (badge) {
+    badge.style.display = isFs ? 'inline-flex' : 'none';
+  }
+
+  if (btnModeKiosk) {
+    btnModeKiosk.classList.toggle('active', isFs);
+  }
+}
+
+function toggleFullScreen() {
+  const isFs = isCurrentlyFullscreen();
+
+  if (!isFs) {
+    const elem = document.documentElement;
+    const req = elem.requestFullscreen ||
+                elem.webkitRequestFullscreen ||
+                elem.mozRequestFullScreen ||
+                elem.msRequestFullscreen;
+    if (req) {
+      req.call(elem).catch(err => {
+        console.warn('Native requestFullscreen could not activate:', err);
+      });
+    }
+  } else {
+    const exit = document.exitFullscreen ||
+                 document.webkitExitFullscreen ||
+                 document.mozCancelFullScreen ||
+                 document.msExitFullscreen;
+    if (exit) {
+      exit.call(document).catch(() => {});
+    }
+  }
+}
+
 // Speech Recognition Setup (Web Speech API)
 function initSpeechRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -802,6 +939,7 @@ function initSpeechRecognition() {
 }
 
 function toggleRecording() {
+  stopVoice();
   if (!recognition) return;
   if (isRecording) {
     recognition.stop();
@@ -839,14 +977,22 @@ function getLocalizedStatus(state) {
   return t.voiceStatusReady;
 }
 
-// Query Handling Logic
+// Query Handling Logic with Speaker Language Auto-Detection
 async function handleUserQuery(query) {
+  stopVoice();
   appendMessage(query, 'user');
   updateVoiceStatus(getLocalizedStatus('processing'));
 
+  // 1. Immediate client-side speaker language detection
+  const detectedByClient = detectSpokenLanguage(query);
+  if (detectedByClient && detectedByClient !== currentLanguage) {
+    console.log(`[Speaker Auto-Switch] Client detected ${detectedByClient}. Updating UI & speech model.`);
+    applyGlobalLanguage(detectedByClient);
+  }
+
+  let effectiveLangCode = currentLanguage.split('-')[0] || 'hi';
   const hasDevanagari = /[\u0900-\u097F]/.test(query);
-  const langCode = currentLanguage.split('-')[0] || 'hi';
-  const isHindiQuery = hasDevanagari || langCode === 'hi';
+  const isHindiQuery = effectiveLangCode === 'hi' || (hasDevanagari && effectiveLangCode !== 'mr');
 
   let botReply = '';
   let matchedDoc = null;
@@ -859,7 +1005,7 @@ async function handleUserQuery(query) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         query: query, 
-        lang: langCode, 
+        lang: effectiveLangCode, 
         isHindi: isHindiQuery,
         district: 'सोनीपत (हरियाणा)'
       })
@@ -869,6 +1015,16 @@ async function handleUserQuery(query) {
       if (data.reply) {
         botReply = data.reply;
         sourceTag = data.source || 'LLaMA-3.2 AI';
+      }
+
+      // If backend detected a specific language from query:
+      if (data.detected_lang) {
+        const backendLangFull = data.detected_lang + '-IN';
+        effectiveLangCode = data.detected_lang;
+        if (currentLanguage !== backendLangFull) {
+          console.log(`[Speaker Auto-Switch] Backend detected ${backendLangFull}. Synchronizing dropdown & UI.`);
+          applyGlobalLanguage(backendLangFull);
+        }
       }
     }
   } catch (err) {
@@ -887,7 +1043,7 @@ async function handleUserQuery(query) {
 
   // 3. Fallback to local high-precision cooperative RAG with statutory citations
   if (!botReply) {
-    const ragResult = queryLocalRAG(query, isHindiQuery, langCode);
+    const ragResult = queryLocalRAG(query, isHindiQuery, effectiveLangCode);
     botReply = ragResult.reply;
     matchedDoc = ragResult.doc;
     sourceTag = 'Knowledge Base (Offline RAG)';
@@ -896,8 +1052,8 @@ async function handleUserQuery(query) {
   appendMessage(botReply, 'bot', matchedDoc, query, sourceTag);
   updateVoiceStatus(getLocalizedStatus('ready'));
 
-  // Speak aloud in selected regional language
-  speakAnswer(botReply, langCode);
+  // Speak aloud in detected regional language matching the speaker
+  speakAnswer(botReply, effectiveLangCode);
 }
 
 // Local RAG Matcher with multilingual statutory citations (Hindi, Marathi, Gujarati, English)
@@ -1050,14 +1206,14 @@ function appendMessage(text, sender, doc = null, originalQuery = '', sourceTag =
 
   if (sender === 'bot') {
     const badge = document.createElement('div');
-    badge.style.fontSize = '0.72rem';
-    badge.style.color = '#14b8a6';
-    badge.style.fontWeight = '600';
+    badge.style.fontSize = '0.74rem';
+    badge.style.color = '#15803d';
+    badge.style.fontWeight = '700';
     badge.style.marginBottom = '6px';
     badge.style.display = 'flex';
     badge.style.alignItems = 'center';
     badge.style.gap = '6px';
-    badge.innerHTML = `<i class="fa-solid fa-scale-balanced"></i> <span>SAHAYAKBot AI Engine (${sourceTag})</span>`;
+    badge.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>सहकारिता मंत्रालय विधिक मार्गदर्शन (Ministry Legal Guidance)</span>`;
     bubble.appendChild(badge);
   }
 
@@ -1087,12 +1243,22 @@ function appendMessage(text, sender, doc = null, originalQuery = '', sourceTag =
       window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(waText), '_blank');
     };
 
-    // Speak Again Button
+    // Speak / Stop Toggle Button
     const hasDevanagari = /[\u0900-\u097F]/.test(text);
     const speakBtn = document.createElement('button');
     speakBtn.className = 'btn-speak-again';
-    speakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> सुनें';
-    speakBtn.onclick = () => speakAnswer(text, hasDevanagari ? 'hi' : 'en');
+    speakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="btn-speak-label">सुनें</span>';
+    speakBtn.onclick = () => {
+      if (isVoicePlaying && activeSpeechBubbleBtn === speakBtn) {
+        stopVoice();
+      } else {
+        stopVoice();
+        activeSpeechBubbleBtn = speakBtn;
+        speakBtn.innerHTML = '<i class="fa-solid fa-stop"></i> <span class="btn-speak-label">रोकें</span>';
+        speakBtn.classList.add('speaking');
+        speakAnswer(text, hasDevanagari ? 'hi' : 'en');
+      }
+    };
 
     actionsRow.appendChild(printBtn);
     actionsRow.appendChild(waBtn);
@@ -1104,15 +1270,82 @@ function appendMessage(text, sender, doc = null, originalQuery = '', sourceTag =
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// Robust Hindi, Marathi, Gujarati & English Speech Output
-function speakAnswer(text, preferredLang = null) {
+// Stop Ongoing Voice Playback (both HTML5 Audio and SpeechSynthesis)
+function stopVoice() {
+  voiceSessionId++; // Invalidate current session so pending sentence callbacks stop immediately
+  isVoicePlaying = false;
+
   if (currentAudio) {
-    currentAudio.pause();
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio.src = '';
+    } catch (e) {}
     currentAudio = null;
   }
+
   if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
   }
+
+  setVoiceUIPlaying(false);
+
+  if (activeSpeechBubbleBtn) {
+    activeSpeechBubbleBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="btn-speak-label">सुनें</span>';
+    activeSpeechBubbleBtn.classList.remove('speaking');
+    activeSpeechBubbleBtn = null;
+  }
+
+  if (voiceStatus) {
+    voiceStatus.innerHTML = '<span style="color: #dc2626; font-weight: 700;"><i class="fa-solid fa-circle-stop"></i> आवाज़ रोक दी गई (Voice Stopped)</span>';
+    setTimeout(() => {
+      if (!isVoicePlaying && !isRecording && voiceStatus) {
+        voiceStatus.innerText = getLocalizedStatus('ready');
+      }
+    }, 1600);
+  }
+}
+
+// Synchronize Voice UI State (Stop button prominence, visualizer wave, status label)
+function setVoiceUIPlaying(isPlaying) {
+  isVoicePlaying = isPlaying;
+  if (visualizer) {
+    visualizer.classList.toggle('listening', isPlaying);
+  }
+  if (stopVoiceBtn) {
+    stopVoiceBtn.classList.toggle('speaking', isPlaying);
+    if (isPlaying) {
+      stopVoiceBtn.setAttribute('title', 'चलती आवाज़ तुरंत रोकें (Stop Ongoing Voice)');
+    } else {
+      stopVoiceBtn.setAttribute('title', 'आवाज़ रोकें (Stop Voice)');
+    }
+  }
+
+  if (!isPlaying) {
+    if (activeSpeechBubbleBtn) {
+      activeSpeechBubbleBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span class="btn-speak-label">सुनें</span>';
+      activeSpeechBubbleBtn.classList.remove('speaking');
+      activeSpeechBubbleBtn = null;
+    }
+  } else {
+    if (voiceStatus) {
+      voiceStatus.innerHTML = '<span style="color: #15803d; font-weight: 700;"><i class="fa-solid fa-volume-high fa-beat-fade"></i> सहायक बोल रहा है...</span> <button class="btn-status-stop" id="statusStopBtn" type="button"><i class="fa-solid fa-stop"></i> रोकें</button>';
+      const statusStopBtn = document.getElementById('statusStopBtn');
+      if (statusStopBtn) {
+        statusStopBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          stopVoice();
+        });
+      }
+    }
+  }
+}
+
+// Robust Hindi, Marathi, Gujarati & English Speech Output
+function speakAnswer(text, preferredLang = null) {
+  stopVoice(); // Clear any previous audio session
 
   const activeLang = preferredLang || currentLanguage.split('-')[0] || 'hi';
 
@@ -1138,15 +1371,23 @@ function speakAnswer(text, preferredLang = null) {
 
 // Server-Powered Multilingual TTS (/api/tts proxy)
 function playServerTTS(text, lang = 'hi') {
+  const mySessionId = ++voiceSessionId;
+  setVoiceUIPlaying(true);
+
   const sentences = text.match(/[^.!?।\n]+[.!?।\n]*/g) || [text];
   let currentIndex = 0;
 
-  visualizer.classList.add('listening');
-
   function playNextSentence() {
+    if (voiceSessionId !== mySessionId) return;
+
     if (currentIndex >= sentences.length || currentIndex >= 5) {
-      visualizer.classList.remove('listening');
-      currentAudio = null;
+      if (voiceSessionId === mySessionId) {
+        currentAudio = null;
+        setVoiceUIPlaying(false);
+        if (voiceStatus && !isRecording) {
+          voiceStatus.innerText = getLocalizedStatus('ready');
+        }
+      }
       return;
     }
 
@@ -1163,19 +1404,28 @@ function playServerTTS(text, lang = 'hi') {
     currentAudio.playbackRate = speechRate;
 
     currentAudio.onended = () => {
-      playNextSentence();
+      if (voiceSessionId === mySessionId) {
+        playNextSentence();
+      }
     };
 
     currentAudio.onerror = (e) => {
+      if (voiceSessionId !== mySessionId) return;
       console.warn('Backend TTS error, trying browser fallback:', e);
       const utter = new SpeechSynthesisUtterance(sentence);
       utter.lang = `${lang}-IN`;
       utter.rate = speechRate;
-      utter.onend = playNextSentence;
+      utter.onend = () => {
+        if (voiceSessionId === mySessionId) playNextSentence();
+      };
+      utter.onerror = () => {
+        if (voiceSessionId === mySessionId) playNextSentence();
+      };
       window.speechSynthesis.speak(utter);
     };
 
     currentAudio.play().catch(err => {
+      if (voiceSessionId !== mySessionId) return;
       console.warn('Audio play catch:', err);
       playNextSentence();
     });
@@ -1186,6 +1436,9 @@ function playServerTTS(text, lang = 'hi') {
 
 // Native SpeechSynthesis playback for English
 function playWithSpeechSynthesis(cleanText, langCode, chosenVoice = null) {
+  const mySessionId = ++voiceSessionId;
+  setVoiceUIPlaying(true);
+
   const utterance = new SpeechSynthesisUtterance(cleanText);
   utterance.lang = langCode;
   utterance.rate = speechRate;
@@ -1194,12 +1447,21 @@ function playWithSpeechSynthesis(cleanText, langCode, chosenVoice = null) {
     utterance.voice = chosenVoice;
   }
 
-  visualizer.classList.add('listening');
   utterance.onend = () => {
-    visualizer.classList.remove('listening');
+    if (voiceSessionId === mySessionId) {
+      setVoiceUIPlaying(false);
+      if (voiceStatus && !isRecording) {
+        voiceStatus.innerText = getLocalizedStatus('ready');
+      }
+    }
   };
   utterance.onerror = () => {
-    visualizer.classList.remove('listening');
+    if (voiceSessionId === mySessionId) {
+      setVoiceUIPlaying(false);
+      if (voiceStatus && !isRecording) {
+        voiceStatus.innerText = getLocalizedStatus('ready');
+      }
+    }
   };
 
   window.speechSynthesis.speak(utterance);

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>सहकार मित्र | AI Cooperative Governance & Legal Platform (SIH26088)</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a365d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  
+  <!-- Professional Enterprise Typography: Inter & Noto Sans Indic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Gujarati:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css?v=2.9">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- 1. NATIONAL TRICOLOR TOP ACCENT STRIP -->
+  <div class="national-identity-strip"></div>
+
+  <!-- 2. NATIONAL TOP UTILITY BAR (Official Metadata & Omnichannel Switchers) -->
+  <div class="national-header-bar" id="viewModeBar">
+    <div class="national-header-container">
+      
+      <div class="nat-left">
+        <i class="fa-solid fa-flag" style="color: #f97316;"></i>
+        <span>सहकारिता मंत्रालय | भारत सरकार (Govt. of India)</span>
+        <span style="opacity: 0.3;">|</span>
+        <span class="sih-token" id="i18nProblem">SIH-2026: SIH26088</span>
+        <span style="opacity: 0.3;">|</span>
+        <span id="i18nStatusSync" style="color: #15803d; font-weight: 600;">
+          <i class="fa-solid fa-circle-check"></i> राष्ट्रीय सहकारी डेटाबेस सिंक
+        </span>
+      </div>
+
+      <div class="nat-modes">
+        <span id="i18nModeInfo" style="font-size: 0.74rem; color: #64748b; margin-right: 4px;">मोड:</span>
+        <button class="mode-chip active" id="btnModeKiosk" data-mode="kiosk" title="Panchayat Touch Kiosk Display">
+          <i class="fa-solid fa-tv"></i> <span id="i18nKioskBtn">कियोस्क</span>
+        </button>
+        <button class="mode-chip" id="btnModePortal" data-mode="portal" title="CSC & PACS Operator Web Portal">
+          <i class="fa-solid fa-laptop"></i> <span id="i18nPortalBtn">सीएससी पोर्टल</span>
+        </button>
+        <button class="mode-chip" id="btnModeMobile" data-mode="mobile" title="Farmer Smartphone Progressive Web App">
+          <i class="fa-solid fa-mobile-screen"></i> <span id="i18nMobileBtn">मोबाइल ऐप</span>
+        </button>
+        <a href="whatsapp.html" target="_blank" class="mode-chip" id="btnModeWhatsapp" style="color: #15803d; border-color: #bbf7d0;" title="Farmer WhatsApp Voice & Chat Bot">
+          <i class="fa-brands fa-whatsapp"></i> <span id="i18nWhatsappBtn">WhatsApp</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Omnichannel Portal Container (Kiosk, CSC Web Portal, Mobile PWA Frame) -->
+  <div id="kioskWrapper" class="portal-wrapper">
+
+    <!-- 3. CRISP, PROFESSIONAL STICKY NAVIGATION BAR -->
+    <header class="gov-navbar app-header">
+      <div class="gov-nav-container">
+        
+        <!-- Official Brand -->
+        <a href="#" class="gov-brand">
+          <div class="gov-emblem-seal">
+            <i class="fa-solid fa-landmark-dome"></i>
+          </div>
+          <div class="gov-brand-text">
+            <h1 id="i18nBrandTitle">SAHAYAKBot (सहायक बॉट)</h1>
+            <p id="i18nBrandSub">सहकारिता मंत्रालय | AI Cooperative Legal & Governance Platform</p>
+          </div>
+        </a>
+
+        <!-- Header Right: Essential Admin & Language Tools -->
+        <div class="gov-nav-tools">
+          
+          <!-- Modern Language Selector Dropdown -->
+          <select id="languageSelect" class="gov-lang-select" title="भाषा चुनें (Select Language)">
+            <option value="hi-IN" selected>🇮🇳 हिन्दी (Hindi)</option>
+            <option value="en-IN">🇬🇧 English</option>
+            <option value="mr-IN">🇮🇳 मराठी (Marathi)</option>
+            <option value="gu-IN">🇮🇳 ગુજરાતી (Gujarati)</option>
+          </select>
+
+          <a href="admin.html" target="_blank" class="gov-nav-btn primary" id="adminPortalLink" title="Ministry Admin Telemetry Portal">
+            <i class="fa-solid fa-gauge-high"></i> <span id="i18nAdminBtn">Admin Portal</span>
+          </a>
+
+          <!-- Utility Icons -->
+          <span class="fullscreen-badge-active" id="fullscreenActiveBadge">
+            <i class="fa-solid fa-expand"></i> KIOSK FULLSCREEN
+          </span>
+
+          <button id="toggleFullscreenBtn" class="gov-icon-btn" title="Toggle Fullscreen">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+
+          <button id="openSettingsBtn" class="gov-icon-btn" title="Settings">
+            <i class="fa-solid fa-sliders"></i>
+          </button>
+
+        </div>
+
+      </div>
+    </header>
+
+    <!-- 4. CLEAN MAIN GREETING SECTION (Official Scale, No Oversized AI Text) -->
+    <section class="gov-hero-section">
+      <div class="gov-hero-container">
+        
+        <div class="gov-hero-breadcrumbs">
+          <a href="#">मुख्य पृष्ठ (Home)</a>
+          <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem;"></i>
+          <span>नागरिक सहकार विधिक सहायता</span>
+        </div>
+
+        <h2 class="gov-hero-heading" id="i18nWelcomeTitle">
+          सहकारी समितियाँ (PACS) एवं किसान विधिक व शासन परामर्श
+        </h2>
+
+        <p class="gov-hero-subtext" id="i18nWelcomeDesc">
+          PACS मॉडल उप-नियम 2023, किसान क्रेडिट कार्ड (KCC 4% शुद्ध दर), PMFBY 72-घंटे क्षति सूचना एवं सहकारी लोकपाल अधिकारों का नागरिक विधिक सहायता पोर्टल।
+        </p>
+
+        <!-- Unified Quick Action Questions -->
+        <div class="quick-topics-wrapper" id="quickScenarioList">
+          <span class="quick-topics-label" id="i18nQuickTitle">
+            <i class="fa-solid fa-bolt" style="color: #d97706;"></i>
+            <span id="i18nQuickSub">त्वरित प्रश्न:</span>
+          </span>
+          <button class="topic-card-btn scenario-chip" data-query="PACS में नया सदस्य कैसे बनें?">
+            <i class="fa-solid fa-user-plus"></i> <span>PACS नया सदस्य नियम</span>
+          </button>
+          <button class="topic-card-btn scenario-chip" data-query="KCC पर 4% ब्याज और लोन के क्या नियम हैं?">
+            <i class="fa-solid fa-credit-card"></i> <span>KCC लोन व 4% ब्याज छूट</span>
+          </button>
+          <button class="topic-card-btn scenario-chip" data-query="फसल नुकसान होने पर PMFBY में 72 घंटे में क्लेम कैसे करें?">
+            <i class="fa-solid fa-cloud-sun-rain"></i> <span>PMFBY फसल बीमा क्लेम</span>
+          </button>
+          <button class="topic-card-btn scenario-chip" data-query="सहकारी समिति में शिकायत व लोकपाल नियम क्या हैं?">
+            <i class="fa-solid fa-gavel"></i> <span>समिति में शिकायत व लोकपाल</span>
+          </button>
+          <button class="topic-card-btn scenario-chip" data-query="सहारा रिफंड पोर्टल पर पैसे वापस कैसे मिलेंगे?">
+            <i class="fa-solid fa-money-bill-transfer"></i> <span>सहारा रिफंड प्रक्रिया</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. STRUCTURED 2-COLUMN ENTERPRISE WORKSPACE -->
+    <main class="gov-workspace">
+
+      <!-- ==================================================================
+           LEFT COLUMN: STRUCTURED CHAT CONTAINER & INPUT FIELD
+           ================================================================== -->
+      <section class="gov-chat-card">
+        
+        <!-- Chat Header -->
+        <div class="chat-card-header">
+          <div class="chat-status-meta">
+            <span class="status-indicator-dot"></span>
+            <span id="i18nAssistantStatus">विधिक वॉयस परामर्श सक्रिय (Active Citizen Assistance)</span>
+          </div>
+          <div class="chat-service-tag">
+            <i class="fa-solid fa-shield-check" style="color: #15803d;"></i> भारत सरकार प्रमाणित
+          </div>
+        </div>
+
+        <!-- Chat Feed -->
+        <div class="chat-container" id="chatContainer">
+          
+          <div class="chat-welcome-banner" id="welcomeBanner">
+            <div class="welcome-icon">
+              <i class="fa-solid fa-building-columns"></i>
+            </div>
+            <div class="welcome-text">
+              <h2>नमस्ते! मैं SAHAYAKBot हूँ।</h2>
+              <p>
+                आप मुझसे पैक्स सदस्यता नियम, KCC 4% सब्सिडी, फसल बीमा 72-घंटे क्षति सूचना या सहकारी समिति लोकपाल से जुड़ी कोई भी कानूनी जानकारी अपनी भाषा में बोलकर या लिखकर पूछ सकते हैं।
+              </p>
+            </div>
+          </div>
+
+          <!-- Dynamic Chat Messages will appear here -->
+        </div>
+
+        <!-- Chat Input & Push-to-Talk Voice Controls -->
+        <div class="chat-footer-controls">
+          
+          <!-- Voice Language Selector Pills -->
+          <div class="voice-lang-bar" id="voiceLangBar">
+            <button class="voice-lang-btn active" data-lang="hi-IN" title="हिन्दी में बोलें">
+              🇮🇳 हिन्दी
+            </button>
+            <button class="voice-lang-btn" data-lang="mr-IN" title="मराठीत बोला">
+              🇮🇳 मराठी
+            </button>
+            <button class="voice-lang-btn" data-lang="gu-IN" title="ગુજરાતીમાં બોલો">
+              🇮🇳 ગુજરાતી
+            </button>
+            <button class="voice-lang-btn" data-lang="en-IN" title="Speak in English">
+              🇬🇧 English
+            </button>
+          </div>
+
+          <!-- Audio Waveform Visualizer -->
+          <div class="voice-visualizer-container" id="visualizer">
+            <div class="visualizer-bar"></div>
+            <div class="visualizer-bar"></div>
+            <div class="visualizer-bar"></div>
+            <div class="visualizer-bar"></div>
+            <div class="visualizer-bar"></div>
+          </div>
+
+          <!-- Voice Status Text -->
+          <div class="voice-status-text" id="voiceStatus">
+            बोलने के लिए माइक बटन दबाएं (Press to Speak)
+          </div>
+
+          <!-- Standard Clean Input Row -->
+          <div class="chat-input-row">
+            
+            <!-- Push-to-Talk Mic Trigger -->
+            <button id="micBtn" class="btn-push-to-talk" title="Push to Talk (बोलें)">
+              <i class="fa-solid fa-microphone"></i>
+              <span class="mic-lang-badge" id="micLangBadge" title="भाषा चक्र">HI</span>
+            </button>
+
+            <!-- Stop Ongoing Voice Button -->
+            <button id="stopVoiceBtn" class="btn-stop-voice" title="चलती आवाज़ रोकें (Stop Voice)" type="button">
+              <i class="fa-solid fa-circle-stop"></i>
+              <span id="i18nStopVoice">रोकें</span>
+            </button>
+
+            <!-- Text Input -->
+            <input type="text" id="textInput" class="text-input-field" placeholder="या यहाँ अपना सवाल लिखें (Type in Hindi, Marathi, Gujarati, English)..." />
+
+            <!-- Send Button -->
+            <button id="sendBtn" class="btn-send-text">
+              <i class="fa-solid fa-paper-plane"></i> <span id="i18nSendBtn">पूछें</span>
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==================================================================
+           RIGHT COLUMN: CLEAN WHITE SERVICE CARDS (No dense dark blocks)
+           ================================================================== -->
+      <aside class="gov-sidebar">
+
+        <!-- Card 1: Statutory Authority & Compliance -->
+        <div class="gov-card">
+          <div class="card-title-row">
+            <h3 id="i18nStatutoryTitle">
+              <i class="fa-solid fa-scale-balanced" style="color: #1a365d;"></i> वैधानिक प्राधिकार (Statutory Authority)
+            </h3>
+            <span class="badge-official">GOI राजपत्र</span>
+          </div>
+          <ul class="statutory-list" id="statutoryList">
+            <li><i class="fa-solid fa-circle-check"></i> <strong>पैक्स:</strong> मॉडल उप-नियम 2023 (धारा 7 - सदस्यता अधिकार)</li>
+            <li><i class="fa-solid fa-circle-check"></i> <strong>KCC:</strong> 4% शुद्ध दर (IS-PRI योजना व 3% ब्याज छूट)</li>
+            <li><i class="fa-solid fa-circle-check"></i> <strong>फसल बीमा:</strong> 72-घंटे क्षति सूचना (PMFBY क्लॉज 14.2)</li>
+            <li><i class="fa-solid fa-circle-check"></i> <strong>विवाद:</strong> MSCS अधिनियम 2023 (धारा 84 व लोकपाल)</li>
+            <li><i class="fa-solid fa-circle-check"></i> <strong>डेटा सुरक्षा:</strong> DPDP Act 2023 अनुपालित व सुरक्षित</li>
+          </ul>
+        </div>
+
+        <!-- Card 2: Unified Citizen Services & Verification -->
+        <div class="gov-card">
+          <div class="card-title-row">
+            <h4>
+              <i class="fa-solid fa-layer-group" style="color: #15803d;"></i> त्वरित नागरिक सेवाएं व सत्यापन
+            </h4>
+            <span class="badge-official" style="color: #15803d; background: #f0fdf4;">सक्रिय सेवाएं</span>
+          </div>
+          
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+            
+            <!-- Service 1: KCC 4% Subsidized Loan Calculator -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: #1a365d; font-size: 0.84rem;">
+                  <i class="fa-solid fa-calculator" style="color: #15803d; margin-right: 5px;"></i> KCC 4% ब्याज छूट
+                </span>
+                <span style="font-size: 0.72rem; color: #15803d; font-weight: 700; background: #dcfce7; padding: 1px 6px; border-radius: 4px;">शुद्ध दर 4%</span>
+              </div>
+              <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 8px; line-height: 1.4;">
+                समय पर ऋण चुकाने पर 3% सरकारी छूट। अपनी वास्तविक बचत तुरंत गणना करें।
+              </p>
+              <button id="openKccCalcBtn" class="btn-card-action emerald" style="margin-top: 0;" title="KCC 4% Subsidized Loan & Benefit Calculator">
+                <i class="fa-solid fa-calculator"></i> <span id="i18nKccCalc">KCC 4% कैलकुलेटर खोलें</span>
+              </button>
+            </div>
+
+            <!-- Service 2: Biometric Aadhaar PACS Authentication -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: #1a365d; font-size: 0.84rem;">
+                  <i class="fa-solid fa-fingerprint" style="color: #1a365d; margin-right: 5px;"></i> किसान बायोमेट्रिक
+                </span>
+                <span style="font-size: 0.72rem; color: #1a365d; font-weight: 600; background: #ebf2fa; padding: 1px 6px; border-radius: 4px;">UIDAI आधार</span>
+              </div>
+              <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 8px; line-height: 1.4;">
+                अंगूठा स्कैन करके अपने पैक्स खाते, KCC ऋण सीमा व फसल बीमा दावों की स्थिति जांचें।
+              </p>
+              <button id="biometricBtn" class="btn-card-action" style="margin-top: 0;" title="Farmer Biometric Login">
+                <i class="fa-solid fa-fingerprint" style="color: #15803d;"></i> <span id="i18nBiometric">अंगूठा स्कैन करें (Simulate)</span>
+              </button>
+
+              <!-- Farmer Profile Card (Hidden until Aadhaar Authenticated) -->
+              <div class="farmer-profile-card" id="farmerProfileCard" style="display: none; margin-top: 10px;">
+                <div class="farmer-profile-header">
+                  <div class="farmer-avatar">
+                    <i class="fa-solid fa-user-check"></i>
+                  </div>
+                  <div>
+                    <h5 style="color: #0f172a; font-size: 0.84rem; margin: 0;" id="i18nFarmerName">रमेश कुमार (Ramesh Kumar)</h5>
+                    <span style="font-size: 0.7rem; color: #15803d; font-weight: 600;" id="i18nFarmerBadge"><i class="fa-solid fa-shield-check"></i> आधार सत्यापित</span>
+                  </div>
+                </div>
+                <div class="farmer-profile-details" id="farmerProfileDetails">
+                  <div><strong>पैक्स:</strong> सोनीपत PACS (#PACS-HR-9042)</div>
+                  <div><strong>KCC खाता:</strong> ₹1,80,000 (ब्याज: 4% Subsidized)</div>
+                  <div><strong>भूमि:</strong> 3.5 एकड़ (खसरा 142/8)</div>
+                  <div><strong>दावा:</strong> PMFBY बीमा दावा लंबित (₹28,500)</div>
+                </div>
+                <button id="logoutFarmerBtn" style="margin-top: 8px; width: 100%; background: #e2e8f0; color: #334155; border: none; padding: 6px; border-radius: 4px; font-size: 0.74rem; font-weight: 600; cursor: pointer;">
+                  <i class="fa-solid fa-arrow-right-from-bracket"></i> <span id="i18nLogoutBtn">लॉगआउट करें</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Service 3: Legal Grievance Acknowledgement Slip -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: #1a365d; font-size: 0.84rem;">
+                  <i class="fa-solid fa-file-invoice" style="color: #d97706; margin-right: 5px;"></i> शिकायत पावती पर्ची
+                </span>
+                <span style="font-size: 0.72rem; color: #b45309; font-weight: 600; background: #fffbeb; padding: 1px 6px; border-radius: 4px;">विधिक प्रमाण</span>
+              </div>
+              <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 8px; line-height: 1.4;">
+                कियोस्क से अपनी शिकायत या आवेदन की आधिकारिक पावती टोकन संख्या व क्यूआर कोड सहित प्राप्त करें।
+              </p>
+              <button id="openReceiptBtn" class="btn-card-action" style="margin-top: 0;" title="आधिकारिक शिकायत पावती देखें एवं प्रिंट करें">
+                <i class="fa-solid fa-print"></i> <span id="i18nReceipt">पावती पर्ची देखें / प्रिंट करें</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </aside>
+
+    </main>
+
+    <!-- 6. PROFESSIONAL GOVERNMENT FOOTER (Subtle Technical Telemetry) -->
+    <footer class="gov-portal-footer">
+      <div class="footer-container">
+        
+        <div>
+          <div style="font-weight: 700; color: #1a365d; margin-bottom: 2px;">
+            सहकारिता मंत्रालय | भारत सरकार (Ministry of Cooperation, Government of India)
+          </div>
+          <div style="font-size: 0.75rem; color: #64748b;">
+            राष्ट्रीय सहकारी डेटाबेस व एआई विधिक मार्गदर्शन प्रणाली | नागरिक हेल्पलाइन: 1800-180-1551
+          </div>
+        </div>
+
+        <div class="footer-compliance-row">
+          <span class="footer-tag">
+            <i class="fa-solid fa-shield-check" style="color: #15803d;"></i> DPDP Act 2023
+          </span>
+          <span class="footer-tag">
+            <i class="fa-solid fa-microchip" style="color: #1a365d;"></i> Edge AI Node
+          </span>
+          <span class="footer-tag" id="i18nStatusSpeech">
+            <i class="fa-solid fa-volume-high" style="color: #0284c7;"></i> Indic Speech Active
+          </span>
+          <span class="footer-tag">
+            <i class="fa-solid fa-database" style="color: #d97706;"></i> SQLite Audit Log
+          </span>
+        </div>
+
+      </div>
+      <div style="max-width: 1400px; margin: 12px auto 0 auto; text-align: center; font-size: 0.72rem; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+        © 2026 SAHAYAKBot | Smart India Hackathon 2026 (SIH26088). All Rights Reserved.
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==========================================================================
+       MODALS: KCC CALCULATOR, RECEIPT SLIP, BIOMETRIC, SETTINGS
+       ========================================================================== -->
+
+  <!-- 1. KCC 4% Subsidized Loan Calculator Modal -->
+  <div class="modal-overlay" id="kccCalcModal">
+    <div class="calc-modal-card">
+      <div class="calc-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="background: #f0fdf4; color: #15803d; padding: 8px; border-radius: 8px; font-size: 1.1rem;">
+            <i class="fa-solid fa-calculator"></i>
+          </div>
+          <div>
+            <h4 style="margin: 0; color: #1a365d; font-size: 0.96rem; font-weight: 700;">KCC 4% शुद्ध ब्याज व सब्सिडी कैलकुलेटर</h4>
+            <p style="margin: 2px 0 0 0; color: #64748b; font-size: 0.74rem;">भारत सरकार ब्याज छूट योजना (IS-PRI) एवं RBI दिशा-निर्देश</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="closeKccCalcBtn">✕</button>
+      </div>
+
+      <div class="calc-body">
+        <div style="margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #334155; margin-bottom: 6px;">
+            <span>ऋण राशि (Loan Amount):</span>
+            <strong id="calcLoanValDisplay" style="color: #1a365d; font-size: 1.15rem; font-weight: 700;">₹ 1,50,000</strong>
+          </div>
+          <input type="range" id="kccLoanRange" min="20000" max="300000" step="10000" value="150000" style="width: 100%; accent-color: #1a365d;" />
+          <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-top: 4px;">
+            <span>₹ 20,000</span>
+            <span>₹ 1.6 लाख (कोलेटरल-मुक्त)</span>
+            <span>₹ 3,00,000 (अधिकतम 4% सीमा)</span>
+          </div>
+        </div>
+
+        <div class="calc-results-grid">
+          <div class="calc-result-box">
+            <div class="calc-res-label">सामान्य बैंक दर (Base)</div>
+            <div class="calc-res-val" style="color: #475569;">7.0%</div>
+            <div class="calc-res-sub" id="calcBaseInt" style="color: #64748b;">₹10,500 / वर्ष</div>
+          </div>
+
+          <div class="calc-result-box highlight-subvention">
+            <div class="calc-res-label">केन्द्रीय ब्याज छूट</div>
+            <div class="calc-res-val" style="color: #15803d;">-3.0%</div>
+            <div class="calc-res-sub" style="color: #15803d;" id="calcSubventionAmt">₹4,500 सरकार देगी</div>
+          </div>
+
+          <div class="calc-result-box highlight-net">
+            <div class="calc-res-label">किसान को शुद्ध ब्याज</div>
+            <div class="calc-res-val" style="color: #1a365d;">केवल 4.0%</div>
+            <div class="calc-res-sub" style="color: #1a365d;" id="calcNetInt">₹6,000 / वर्ष</div>
+          </div>
+        </div>
+
+        <div class="calc-benefit-banner">
+          <i class="fa-solid fa-circle-check" style="color: #15803d; font-size: 1.3rem;"></i>
+          <div style="font-size: 0.82rem; color: #1e293b;">
+            <strong>किसान की वार्षिक बचत: <span id="calcSavingsDisplay" style="color: #15803d; font-weight: 700;">₹4,500</span></strong><br>
+            <span style="font-size: 0.74rem; color: #64748b;">*समय पर ऋण चुकाने पर 3% शीघ्र पुनर्भुगतान प्रोत्साहन (PRI)</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 14px;">
+          <button class="btn-send-text" id="kccPrintSummaryBtn" style="flex: 1; justify-content: center;">
+            <i class="fa-solid fa-print"></i> <span>पर्ची प्रिंट करें</span>
+          </button>
+          <button class="btn-receipt-whatsapp" id="kccWhatsappSummaryBtn">
+            <i class="fa-brands fa-whatsapp"></i> <span>WhatsApp</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="settings-modal-card" style="padding: 20px; max-width: 400px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h4 style="margin: 0; color: #1a365d; font-size: 0.96rem; font-weight: 700;"><i class="fa-solid fa-sliders"></i> सिस्टम सेटिंग्स</h4>
+        <button class="btn-close-modal" id="closeSettingsBtn">✕</button>
+      </div>
+      
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 0.82rem; color: #334155; font-weight: 600; display: block; margin-bottom: 4px;">
+          Google Gemini API Key (वैकल्पिक / Optional):
+        </label>
+        <input type="password" id="geminiApiKeyInput" class="text-input-field" style="width: 100%; border-radius: 6px; padding: 8px 12px;" placeholder="AIzaSy..." />
+        <p style="font-size: 0.72rem; color: #64748b; margin-top: 4px;">
+          * इन-बिल्ट LLaMA-3.2 NIM AI व PACS विधिक डेटाबेस सक्रिय है।
+        </p>
+      </div>
+
+      <div style="margin-bottom: 18px;">
+        <label style="font-size: 0.82rem; color: #334155; font-weight: 600; display: block; margin-bottom: 4px;">आवाज की गति (Speech Speed):</label>
+        <input type="range" id="speechRateRange" min="0.7" max="1.3" step="0.1" value="1.0" style="width: 100%; accent-color: #1a365d;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn-send-text" id="saveSettingsBtn" style="padding: 7px 16px; font-size: 0.82rem;">सेव करें</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Biometric Scanner Modal -->
+  <div class="modal-overlay" id="biometricModal">
+    <div class="scanner-card">
+      <div class="calc-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="background: #f0fdf4; color: #15803d; padding: 8px; border-radius: 8px; font-size: 1.1rem;">
+            <i class="fa-solid fa-fingerprint"></i>
+          </div>
+          <div>
+            <h4 style="margin: 0; color: #1a365d; font-size: 0.96rem; font-weight: 700;">किसान बायोमेट्रिक प्रमाणीकरण</h4>
+            <p style="margin: 2px 0 0 0; color: #64748b; font-size: 0.74rem;">सहकारिता मंत्रालय (GOI) - आधार / PACS सदस्य सत्यापन</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="closeBiometricBtn">✕</button>
+      </div>
+
+      <div class="calc-body" style="text-align: center;">
+        <div class="fingerprint-scan-zone" id="scanZone">
+          <div class="scan-laser-line" id="laserLine"></div>
+          <i class="fa-solid fa-fingerprint scanner-icon" id="scannerIcon"></i>
+        </div>
+
+        <div class="scanner-status" id="scannerStatusText">
+          कृपया अपना अंगूठा बायोमेट्रिक सेंसर पर रखें...
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 16px;">
+          <button class="btn-send-text" id="triggerScanBtn">
+            <i class="fa-solid fa-hand"></i> <span>अंगूठा स्कैन करें (Simulate)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Formal Grievance Acknowledgement Slip Modal -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="scanner-card" style="max-width: 500px; background: #ffffff; color: #1e293b; border: 1.5px solid #1a365d; border-radius: 12px; overflow: hidden; padding: 0;">
+      <div style="background: #1a365d; color: white; padding: 14px 18px; text-align: center;">
+        <div style="font-size: 1.05rem; font-weight: 700;">सहकारिता मंत्रालय, भारत सरकार</div>
+        <div style="font-size: 0.78rem; opacity: 0.9;">Ministry of Cooperation | शिकायत निवारण व विधिक पावती</div>
+      </div>
+      <div style="padding: 18px; font-size: 0.86rem;">
+        <div style="text-align: center; font-weight: 700; color: #1a365d; margin-bottom: 12px; font-size: 0.95rem;">
+          आधिकारिक पावती पर्ची (Formal Legal Acknowledgement Slip)
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 7px 4px; font-weight: 600; color: #475569; width: 42%;">पावती संदर्भ संख्या:</td>
+            <td id="slipToken" style="padding: 7px 4px; font-weight: 700; color: #b45309;">MOC-2026-4891</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">आवेदक / सदस्य नाम:</td>
+            <td id="slipCitizen" style="padding: 7px 4px; font-weight: 600;">राम सिंह (सदस्य सं. 402)</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">संबद्ध पैक्स (PACS):</td>
+            <td id="slipPacs" style="padding: 7px 4px;">सोनीपत प्राथमिक कृषि साख समिति (PACS)</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">विषय / कानूनी मामला:</td>
+            <td id="slipCategory" style="padding: 7px 4px; font-weight: 600;">पैक्स सदस्यता अधिकार व उप-नियम</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">वैधानिक आधार:</td>
+            <td id="slipStatute" style="padding: 7px 4px; color: #15803d; font-weight: 700;">मॉडल उप-नियम 2023, धारा 7</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">समय-सीमा (SLA):</td>
+            <td style="padding: 7px 4px; color: #dc2626; font-weight: 700;">30 कार्य दिवस (ARCS वैधानिक आदेश)</td>
+          </tr>
+        </table>
+
+        <div style="text-align: center; margin: 14px 0; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1;">
+          <svg width="76" height="76" viewBox="0 0 100 100">
+            <rect width="100" height="100" fill="#ffffff" />
+            <rect x="10" y="10" width="25" height="25" fill="#1a365d" />
+            <rect x="65" y="10" width="25" height="25" fill="#1a365d" />
+            <rect x="10" y="65" width="25" height="25" fill="#1a365d" />
+            <rect x="15" y="15" width="15" height="15" fill="#ffffff" />
+            <rect x="70" y="15" width="15" height="15" fill="#ffffff" />
+            <rect x="15" y="70" width="15" height="15" fill="#ffffff" />
+            <rect x="42" y="15" width="16" height="16" fill="#1a365d" />
+            <rect x="42" y="42" width="16" height="16" fill="#1a365d" />
+            <rect x="70" y="45" width="18" height="18" fill="#1a365d" />
+            <rect x="45" y="70" width="20" height="20" fill="#1a365d" />
+          </svg>
+          <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px; font-weight: 600;">
+            सत्यापन क्यूआर कोड (National Cooperative Grievance Portal)
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; padding: 12px 18px; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+        <button class="btn-send-text" id="printSlipBtn" style="flex: 1; justify-content: center;" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> <span id="i18nSlipPrint">प्रिंट / PDF सेव करें</span>
+        </button>
+        <button class="btn-receipt-whatsapp" id="whatsappSlipBtn">
+          <i class="fa-brands fa-whatsapp"></i> <span id="i18nSlipWa">WhatsApp</span>
+        </button>
+        <button class="btn-close-modal" id="closeReceiptBtn"><span id="i18nSlipClose">✕</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=2.9"></script>
+  <script>
+    // PWA Service Worker Registration & Live Cache Purge
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js?v=2.9')
+          .then(reg => {
+            console.log('[PWA] Service Worker registered:', reg.scope);
+            reg.update();
+          })
+          .catch(err => console.warn('[PWA] SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

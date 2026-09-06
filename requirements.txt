@@ -1,0 +1,4 @@
+# SAHAYAKBot / Sahakar Mitra (SIH26088)
+# Python Core Dependencies
+
+requests>=2.28.0

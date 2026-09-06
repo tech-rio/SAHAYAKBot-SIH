@@ -22,6 +22,7 @@ import traceback
 import time
 from datetime import datetime
 import requests
+import re
 
 # Fix Windows console UTF-8 output at the very top
 if hasattr(sys.stdout, 'reconfigure'):
@@ -30,39 +31,60 @@ if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 PORT = 8000
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sahakar_mitra.db')
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+PUBLIC_DIR = os.path.join(ROOT_DIR, 'public')
+DATA_DIR = os.path.join(ROOT_DIR, 'data')
 
-# Try to find NVIDIA_API_KEY from environment or ../AI/chatbot_project/.env
+# Database path: check data/ directory first, then root fallback
+DB_PATH = os.path.join(DATA_DIR, 'sahakar_mitra.db')
+if not os.path.exists(DB_PATH):
+    alt_db = os.path.join(ROOT_DIR, 'sahakar_mitra.db')
+    if os.path.exists(alt_db):
+        DB_PATH = alt_db
+
+# Try to find NVIDIA_API_KEY from environment, local .env, or alt .env
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
 if not NVIDIA_API_KEY:
-    alt_env = r"E:\AI\chatbot_project\.env"
-    if os.path.exists(alt_env):
-        with open(alt_env, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith("NVIDIA_API_KEY="):
-                    NVIDIA_API_KEY = line.split("=", 1)[1].strip().strip("'\"")
-                    break
+    env_paths = [
+        os.path.join(ROOT_DIR, ".env"),
+        r"E:\AI\chatbot_project\.env"
+    ]
+    for p in env_paths:
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("NVIDIA_API_KEY="):
+                        NVIDIA_API_KEY = line.split("=", 1)[1].strip().strip("'\"")
+                        break
+        if NVIDIA_API_KEY:
+            break
+
+if not NVIDIA_API_KEY:
+    # High-reliability fallback key
+    NVIDIA_API_KEY = "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"
 
 AI_MODEL = "meta/llama-3.2-11b-vision-instruct"
 NVIDIA_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions"
 
-SYSTEM_PROMPT = """You are 'Sahakar Mitra', the official voice-enabled AI Assistant for the Ministry of Cooperation, Government of India.
-Your mission is to provide legally accurate, reliable guidance to rural farmers and PACS members.
+SYSTEM_PROMPT = """You are 'Sahakar Mitra' (SAHAYAKBot), the official multilingual voice AI Assistant for the Ministry of Cooperation, Government of India.
+Your mission is to provide legally accurate, reliable guidance to rural farmers and cooperative members in their native spoken language (Hindi, Marathi, Gujarati, or English).
 
 MANDATORY STATUTORY CITATION RULE:
-At the end of your response, ALWAYS include a one-line formal statutory reference:
-- For PACS membership/rules: cite "⚖️ वैधानिक संदर्भ: मॉडल उप-नियम 2023, धारा 7"
-- For KCC loans: cite "⚖️ वैधानिक संदर्भ: RBI/NABARD KCC दिशा-निर्देश एवं ब्याज छूट योजना (IS-PRI)"
-- For Crop Damage/Insurance: cite "⚖️ वैधानिक संदर्भ: PMFBY दिशा-निर्देश 2020 (क्लॉज 14.2 - 72 घंटे समय सीमा)"
-- For Disputes/Elections: cite "⚖️ वैधानिक संदर्भ: बहु-राज्य सहकारी समिति अधिनियम 2023, धारा 84"
-- For Sahara Refund: cite "⚖️ वैधानिक संदर्भ: माननीय सर्वोच्च न्यायालय आदेश (CRCS रिफंड पोर्टल)"
+At the end of your response, ALWAYS include an official statutory reference in the target language:
+- For PACS membership/rules: cite "मॉडल उप-नियम 2023, धारा 7" / "Model Bye-Laws 2023, Clause 7"
+- For KCC loans: cite "RBI/NABARD Interest Subvention Scheme (IS-PRI 4% net)"
+- For Crop Damage/Insurance: cite "PMFBY Guidelines 2020 (Clause 14.2 - 72-Hour Claim Window)"
+- For Disputes/Elections: cite "MSCS Act 2023, Section 84"
+- For Sahara Refund: cite "Supreme Court Order / CRCS Portal"
 
-MANDATORY LANGUAGE RULE:
-- Unless the user explicitly asks you to speak in English, you MUST ALWAYS respond in 100% pure Devanagari Hindi (देवनागरी हिन्दी).
-- Do NOT use Roman/Latin English letters for Hindi words.
-- Every explanation must be polite, direct, and structured in 2 to 4 clear bullet points.
-"""
+MANDATORY LANGUAGE ADHERENCE RULE:
+- Strictly respond in the specified target language (Hindi, Marathi, Gujarati, or English).
+- When responding in English: Output strictly in clear, professional English. Absolutely no Devanagari.
+- When responding in Marathi: Output strictly in pure Marathi (मराठी लिपी).
+- When responding in Gujarati: Output strictly in pure Gujarati (ગુજરાતી લિપિ).
+- When responding in Hindi: Output strictly in pure Hindi (हिन्दी लिपी).
+- Every explanation must be polite, direct, and structured in 3 to 4 clear bullet points."""
 
 # SQLite Database Helper Functions
 def init_db():
@@ -208,23 +230,68 @@ def log_telemetry_event(query, lang="hi", district="सोनीपत (हर�
     except Exception as e:
         print("[DB Error] Failed to log grievance in SQLite:", e)
 
+def detect_query_language(text, fallback_lang="hi"):
+    if not text:
+        return fallback_lang
+    
+    # 1. Gujarati Unicode block (U+0A80 to U+0AFF)
+    if re.search(r'[\u0A80-\u0AFF]', text):
+        return "gu"
+    
+    # 2. English / Latin alphabet dominance
+    latin_chars = len(re.findall(r'[a-zA-Z]', text))
+    devanagari_chars = len(re.findall(r'[\u0900-\u097F]', text))
+    if latin_chars > 5 and latin_chars > devanagari_chars:
+        return "en"
+        
+    # 3. Marathi vs Hindi in Devanagari
+    if devanagari_chars > 0:
+        marathi_markers = [
+            'आहे', 'आहेत', 'नाही', 'नाहीत', 'कसे', 'काय', 'करायचे', 'करायचा', 'करावे',
+            'सांगा', 'मिळेल', 'मिळतात', 'मिळणार', 'पाहिजे', 'पाहिजेत', 'होय', 'शेतकरी',
+            'पिक', 'कर्ज', 'अर्ज', 'माहिती', 'पॅक्स', 'मदत', 'द्या', 'सांग', 'कोणते',
+            'कोणती', 'कधी', 'कसं', 'कुठे', 'झाले', 'झाली', 'दिले', 'केले', 'सभासद',
+            'सभासदत्व', 'गावातील', 'माझे', 'माझ्या', 'आमच्या', 'घ्यायचे', 'हवे', 'लागतील',
+            'करावी', 'पावती', 'तक्रार', 'विचारा', 'बोला'
+        ]
+        hindi_markers = [
+            'है', 'हैं', 'होगा', 'होगी', 'कैसे', 'क्या', 'क्यों', 'कहाँ', 'बताओ',
+            'बताइए', 'मिलेगा', 'मिलेगी', 'चाहिए', 'करना', 'करूँ', 'सकते', 'सकता',
+            'हूँ', 'मुझे', 'मेरा', 'मेरी', 'हमारे', 'नियम', 'दीजिए', 'बोलिए'
+        ]
+        
+        words = text.split()
+        m_score = sum(1 for w in words if any(m in w for m in marathi_markers))
+        h_score = sum(1 for w in words if any(h in w for h in hindi_markers))
+        
+        if m_score > h_score and m_score > 0:
+            return "mr"
+        elif h_score > m_score and h_score > 0:
+            return "hi"
+            
+    return fallback_lang
+
 def query_llama_ai(user_query, lang="hi"):
     if not NVIDIA_API_KEY:
         print("[AI Error] NVIDIA_API_KEY is missing!")
-        return None
+        return None, lang
+        
+    # Automatically detect actual language of the query
+    detected_lang = detect_query_language(user_query, fallback_lang=lang)
+    effective_lang = detected_lang or lang
         
     headers = {
         "Authorization": f"Bearer {NVIDIA_API_KEY}",
         "Content-Type": "application/json"
     }
     
-    if lang == "mr":
+    if effective_lang == "mr":
         lang_instruction = "MANDATORY: You must respond in pure Marathi (मराठी देवनागरी लिपी). Use polite and official tone. Provide 3-4 bullet points and statutory reference."
         formatted_user_content = f"प्रश्न: {user_query}\n(कृपया उत्तर फक्त मराठी देवनागरी मध्ये ३-४ मुद्द्यांत द्या):"
-    elif lang == "gu":
+    elif effective_lang == "gu":
         lang_instruction = "MANDATORY: You must respond in pure Gujarati (ગુજરાતી લિપિ). Use polite and official tone. Provide 3-4 bullet points and statutory reference."
         formatted_user_content = f"પ્રશ્ન: {user_query}\n(કૃપા કરીને ફક્ત ગુજરાતી લિપિમાં ૩-૪ મુદ્દામાં જવાબ આપો):"
-    elif lang == "en":
+    elif effective_lang == "en":
         lang_instruction = "MANDATORY: Answer in clear English. Use polite tone, 3-4 bullet points, and official legal citation."
         formatted_user_content = f"Question: {user_query}\n(Please answer in 3-4 clear bullet points with official statutory reference):"
     else:
@@ -245,15 +312,31 @@ def query_llama_ai(user_query, lang="hi"):
         resp = requests.post(NVIDIA_ENDPOINT, headers=headers, json=payload, timeout=22)
         if resp.status_code == 200:
             content = resp.json()["choices"][0]["message"]["content"]
-            return content.strip()
+            return content.strip(), effective_lang
         else:
             print(f"NVIDIA NIM returned status {resp.status_code}: {resp.text}")
-            return None
+            return None, effective_lang
     except Exception as e:
         print("Error connecting to NVIDIA NIM:", e)
-        return None
+        return None, effective_lang
 
 class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=PUBLIC_DIR, **kwargs)
+
+    def safe_write(self, data):
+        try:
+            self.wfile.write(data)
+            return True
+        except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
+            return False
+
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -268,16 +351,20 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Content-Type', 'application/javascript; charset=utf-8')
             self.send_header('Service-Worker-Allowed', '/')
             self.end_headers()
-            with open(os.path.join(os.path.dirname(__file__), 'sw.js'), 'rb') as f:
-                self.wfile.write(f.read())
+            sw_path = os.path.join(PUBLIC_DIR, 'sw.js')
+            if os.path.exists(sw_path):
+                with open(sw_path, 'rb') as f:
+                    self.safe_write(f.read())
             return
 
         if self.path == '/manifest.json':
             self.send_response(200)
             self.send_header('Content-Type', 'application/manifest+json; charset=utf-8')
             self.end_headers()
-            with open(os.path.join(os.path.dirname(__file__), 'manifest.json'), 'rb') as f:
-                self.wfile.write(f.read())
+            manifest_path = os.path.join(PUBLIC_DIR, 'manifest.json')
+            if os.path.exists(manifest_path):
+                with open(manifest_path, 'rb') as f:
+                    self.safe_write(f.read())
             return
 
         # 2. Audio TTS Proxy endpoint
@@ -304,7 +391,7 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_header('Content-Type', 'audio/mpeg')
                     self.send_header('Content-Length', str(len(r.content)))
                     self.end_headers()
-                    self.wfile.write(r.content)
+                    self.safe_write(r.content)
                     return
                 else:
                     self.send_response(r.status_code)
@@ -312,8 +399,11 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                     return
             except Exception as e:
                 print("TTS proxy error:", e)
-                self.send_response(500)
-                self.end_headers()
+                try:
+                    self.send_response(500)
+                    self.end_headers()
+                except Exception:
+                    pass
                 return
 
         # 3. Live Ministry Telemetry API
@@ -325,12 +415,15 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.send_header('Content-Length', str(len(response_bytes)))
                 self.end_headers()
-                self.wfile.write(response_bytes)
+                self.safe_write(response_bytes)
                 return
             except Exception as e:
                 print("Telemetry error:", e)
-                self.send_response(500)
-                self.end_headers()
+                try:
+                    self.send_response(500)
+                    self.end_headers()
+                except Exception:
+                    pass
                 return
 
         # 4. SQLite Permanent Grievances API
@@ -343,12 +436,15 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.send_header('Content-Length', str(len(response_bytes)))
                 self.end_headers()
-                self.wfile.write(response_bytes)
+                self.safe_write(response_bytes)
                 return
             except Exception as e:
                 print("Grievance fetch error:", e)
-                self.send_response(500)
-                self.end_headers()
+                try:
+                    self.send_response(500)
+                    self.end_headers()
+                except Exception:
+                    pass
                 return
 
         # 5. KCC 4% Subsidized Loan Calculator API
@@ -381,11 +477,14 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.send_header('Content-Length', str(len(response_bytes)))
                 self.end_headers()
-                self.wfile.write(response_bytes)
+                self.safe_write(response_bytes)
                 return
             except Exception as e:
-                self.send_response(400)
-                self.end_headers()
+                try:
+                    self.send_response(400)
+                    self.end_headers()
+                except Exception:
+                    pass
                 return
 
         super().do_GET()
@@ -408,23 +507,25 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                 
                 print(f"[AI Query] User asked: '{query}' (lang={lang})")
                 
-                # Query LLaMA 3.2 AI
-                ai_reply = query_llama_ai(query, lang)
+                # Query LLaMA 3.2 AI with automatic speaker language detection
+                ai_reply, detected_lang = query_llama_ai(query, lang)
                 
                 # Real-time Telemetry event logging & SQLite save
-                log_telemetry_event(query, lang, district, ai_reply=ai_reply or "")
+                log_telemetry_event(query, detected_lang, district, ai_reply=ai_reply or "")
                 
                 if ai_reply:
-                    print(f"[AI Response] Success from {AI_MODEL}")
+                    print(f"[AI Response] Success from {AI_MODEL} (detected_lang={detected_lang})")
                     response_payload = {
                         "reply": ai_reply,
+                        "detected_lang": detected_lang,
                         "source": "LLaMA-3.2 (NVIDIA NIM)",
                         "telemetry_synced": True
                     }
                 else:
-                    print("[AI Fallback] Using local knowledge base fallback")
+                    print(f"[AI Fallback] Using local knowledge base fallback (detected_lang={detected_lang})")
                     response_payload = {
                         "reply": None,
+                        "detected_lang": detected_lang,
                         "source": "fallback",
                         "telemetry_synced": True
                     }
@@ -435,13 +536,16 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.send_header('Content-Length', str(len(response_bytes)))
                 self.end_headers()
-                self.wfile.write(response_bytes)
+                self.safe_write(response_bytes)
                 return
             except Exception as e:
                 print("Exception in do_POST /api/chat:")
                 traceback.print_exc()
-                self.send_response(500)
-                self.end_headers()
+                try:
+                    self.send_response(500)
+                    self.end_headers()
+                except Exception:
+                    pass
                 return
 
         # 2. Update Grievance Status (ARCS escalation / Resolved)
@@ -465,12 +569,15 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Content-Length', str(len(response_bytes)))
                 self.end_headers()
-                self.wfile.write(response_bytes)
+                self.safe_write(response_bytes)
                 return
             except Exception as e:
                 print("Error updating grievance status:", e)
-                self.send_response(500)
-                self.end_headers()
+                try:
+                    self.send_response(500)
+                    self.end_headers()
+                except Exception:
+                    pass
                 return
 
         # 3. Create Persistent Grievance from Slip / Action
@@ -500,21 +607,35 @@ class KioskRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Content-Length', str(len(response_bytes)))
                 self.end_headers()
-                self.wfile.write(response_bytes)
+                self.safe_write(response_bytes)
                 return
             except Exception as e:
                 print("Error creating grievance:", e)
-                self.send_response(500)
-                self.end_headers()
+                try:
+                    self.send_response(500)
+                    self.end_headers()
+                except Exception:
+                    pass
                 return
 
         super().do_POST()
 
-http.server.ThreadingHTTPServer.allow_reuse_address = True
+class SafeThreadingHTTPServer(http.server.ThreadingHTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        # Ignore client disconnect errors cleanly (wsasend WinError 10053/10054)
+        exc_type, exc_val, _ = sys.exc_info()
+        if exc_type in (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
+            return
+        super().handle_error(request, client_address)
 
 if __name__ == '__main__':
-    web_dir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(web_dir)
+    if os.path.exists(PUBLIC_DIR):
+        os.chdir(PUBLIC_DIR)
+    else:
+        os.chdir(ROOT_DIR)
 
     print("=" * 70)
     print("🌾 Sahakar Mitra - AI Cooperative Legal Intelligence & Governance Server")
@@ -525,10 +646,11 @@ if __name__ == '__main__':
     print(f"🧮 KCC Subvention Engine: 4% Net Rate Calculator (/api/kcc-calculate active)")
     print(f"📱 Offline PWA: Service Worker & Web Manifest Ready (/sw.js, /manifest.json)")
     print(f"🔑 NVIDIA API Key: {'Configured and Ready!' if NVIDIA_API_KEY else 'Not Found'}")
+    print(f"📂 Static Root: {PUBLIC_DIR}")
     print(f"🚀 Running locally on: http://127.0.0.1:{PORT}")
     print("=" * 70)
 
-    with http.server.ThreadingHTTPServer(("127.0.0.1", PORT), KioskRequestHandler) as httpd:
+    with SafeThreadingHTTPServer(("127.0.0.1", PORT), KioskRequestHandler) as httpd:
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
