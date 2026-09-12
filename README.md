@@ -15,8 +15,9 @@
 ---
 
 ## 🎯 Live Working Deployment
-* 📱 **Citizen Voice Portal (Mobile & Web):** [Launch Citizen Portal](https://reporters-programs-developer-creator.trycloudflare.com/index.html)
-* 📊 **National Ministry Telemetry & Grievance Dashboard:** [Launch Ministry Admin Portal](https://reporters-programs-developer-creator.trycloudflare.com/admin.html)
+* 📱 **Citizen Voice Portal (Mobile & Web):** [Launch Citizen Portal](https://full-cheers-attacked-collections.trycloudflare.com/index.html)
+* 📊 **National Ministry Telemetry & Grievance Dashboard:** [Launch Ministry Admin Portal](https://full-cheers-attacked-collections.trycloudflare.com/admin.html)
+* 💬 **Farmer WhatsApp Bot Interface:** [Launch WhatsApp Bot](https://full-cheers-attacked-collections.trycloudflare.com/whatsapp.html)
 
 ---
 
