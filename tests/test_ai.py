@@ -1,11 +1,26 @@
 import requests
 import json
 import sys
+import os
 
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
-api_key = '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'
+# Load API key from environment or .env file — NEVER hardcode keys
+api_key = os.environ.get("NVIDIA_API_KEY", "")
+if not api_key:
+    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+    if os.path.exists(env_path):
+        with open(env_path, "r") as f:
+            for line in f:
+                if line.strip().startswith("NVIDIA_API_KEY="):
+                    api_key = line.strip().split("=", 1)[1].strip().strip("'\"")
+                    break
+
+if not api_key:
+    print("ERROR: NVIDIA_API_KEY not found. Set it in .env file or environment variable.")
+    sys.exit(1)
+
 url = 'https://integrate.api.nvidia.com/v1/chat/completions'
 headers = {'Authorization': f'Bearer {api_key}', 'Content-Type': 'application/json'}
 

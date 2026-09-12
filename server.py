@@ -42,27 +42,21 @@ if not os.path.exists(DB_PATH):
     if os.path.exists(alt_db):
         DB_PATH = alt_db
 
-# Try to find NVIDIA_API_KEY from environment, local .env, or alt .env
+# Load NVIDIA_API_KEY from environment or local .env file
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
 if not NVIDIA_API_KEY:
-    env_paths = [
-        os.path.join(ROOT_DIR, ".env"),
-        r"E:\AI\chatbot_project\.env"
-    ]
-    for p in env_paths:
-        if os.path.exists(p):
-            with open(p, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if line.startswith("NVIDIA_API_KEY="):
-                        NVIDIA_API_KEY = line.split("=", 1)[1].strip().strip("'\"")
-                        break
-        if NVIDIA_API_KEY:
-            break
+    env_path = os.path.join(ROOT_DIR, ".env")
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("NVIDIA_API_KEY="):
+                    NVIDIA_API_KEY = line.split("=", 1)[1].strip().strip("'\"")
+                    break
 
 if not NVIDIA_API_KEY:
-    # High-reliability fallback key
-    NVIDIA_API_KEY = "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"
+    print("[WARNING] NVIDIA_API_KEY not configured. AI will use offline RAG knowledge base only.")
+    print("[INFO] Set NVIDIA_API_KEY in .env file or environment variable for cloud AI.")
 
 AI_MODEL = "meta/llama-3.2-11b-vision-instruct"
 NVIDIA_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions"
@@ -219,23 +213,18 @@ def update_db_grievance_status(token, new_status):
 
 # Telemetry in-memory caching synced with SQLite
 TELEMETRY_DATA = {
-    "total_queries": 1482,
-    "resolved_queries": 1396,
-    "kcc_amount_helped_cr": 4.28,
-    "pmfby_claims_assisted": 312,
+    "total_queries": 0,
+    "resolved_queries": 0,
+    "kcc_amount_helped_cr": 0.0,
+    "pmfby_claims_assisted": 0,
     "online_kiosks": 28,
     "categories": {
-        "kcc": 608,
-        "pmfby": 400,
-        "pacs_bylaws": 282,
-        "grievance": 192
+        "kcc": 0,
+        "pmfby": 0,
+        "pacs_bylaws": 0,
+        "grievance": 0
     },
-    "recent_events": [
-        {"id": "EVT-8941", "time": "अभी (Live)", "district": "सोनीपत (हरियाणा)", "pacs": "Sonipat Central PACS-42", "query": "KCC 4% ऋण पर ब्याज छूट नियम", "status": "सत्यापित", "category": "KCC 4% Loan"},
-        {"id": "EVT-8940", "time": "2 मिनट पूर्व", "district": "पुणे (महाराष्ट्र)", "pacs": "Haveli Taluka PACS-18", "query": "PACS सभासदत्व नवीन अर्ज नियम", "status": "सत्यापित", "category": "PACS Bylaws"},
-        {"id": "EVT-8939", "time": "5 मिनट पूर्व", "district": "आणंद (गुजरात)", "pacs": "Amul Milk Co-op Union", "query": "દૂધ મંડળી ચૂંટણી વિવાદ અને ઓમ્બુડ્સમેન", "status": "सत्यापित", "category": "Disputes"},
-        {"id": "EVT-8938", "time": "8 मिनट पूर्व", "district": "वाराणसी (उत्तर प्रदेश)", "pacs": "Kashi Sahakari Samiti", "query": "PMFBY 72 घंटे में ओलावृष्टि क्लेम", "status": "सत्यापित", "category": "PMFBY Insurance"}
-    ]
+    "recent_events": []
 }
 
 def log_telemetry_event(query, lang="hi", district="सोनीपत (हरियाणा)", category="General Inquiry", ai_reply=""):

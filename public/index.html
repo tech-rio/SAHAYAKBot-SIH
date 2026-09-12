@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Gujarati:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=3.3">
+  <link rel="stylesheet" href="style.css?v=3.8">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -38,14 +38,14 @@
       </div>
 
       <div class="nat-modes">
-        <span id="i18nModeInfo" style="font-size: 0.74rem; color: #64748b; margin-right: 4px;">मोड:</span>
-        <button class="mode-chip active" id="btnModeKiosk" data-mode="kiosk" title="Panchayat Touch Kiosk Display">
+        <span id="i18nModeInfo" style="font-size: 0.74rem; color: var(--text-muted); margin-right: 4px;">मोड:</span>
+        <button aria-label="Panchayat Touch Kiosk Display" class="mode-chip active" id="btnModeKiosk" data-mode="kiosk" title="Panchayat Touch Kiosk Display">
           <i class="fa-solid fa-tv"></i> <span id="i18nKioskBtn">कियोस्क</span>
         </button>
-        <button class="mode-chip" id="btnModePortal" data-mode="portal" title="CSC & PACS Operator Web Portal">
+        <button aria-label="CSC & PACS Operator Web Portal" class="mode-chip" id="btnModePortal" data-mode="portal" title="CSC & PACS Operator Web Portal">
           <i class="fa-solid fa-laptop"></i> <span id="i18nPortalBtn">सीएससी पोर्टल</span>
         </button>
-        <button class="mode-chip" id="btnModeMobile" data-mode="mobile" title="Farmer Smartphone Progressive Web App">
+        <button aria-label="Farmer Smartphone Progressive Web App" class="mode-chip" id="btnModeMobile" data-mode="mobile" title="Farmer Smartphone Progressive Web App">
           <i class="fa-solid fa-mobile-screen"></i> <span id="i18nMobileBtn">मोबाइल ऐप</span>
         </button>
         <a href="whatsapp.html" target="_blank" class="mode-chip" id="btnModeWhatsapp" style="color: #15803d; border-color: #bbf7d0;" title="Farmer WhatsApp Voice & Chat Bot">
@@ -89,16 +89,20 @@
             <i class="fa-solid fa-gauge-high"></i> <span id="i18nAdminBtn">Admin Portal</span>
           </a>
 
+          <button class="gov-nav-btn" id="darkModeToggle" title="Toggle Dark Mode" style="border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; border-radius: var(--radius-card); padding: 8px 12px; margin-left: 8px;">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
           <!-- Utility Icons -->
           <span class="fullscreen-badge-active" id="fullscreenActiveBadge">
             <i class="fa-solid fa-expand"></i> KIOSK FULLSCREEN
           </span>
 
-          <button id="toggleFullscreenBtn" class="gov-icon-btn" title="Toggle Fullscreen">
+          <button aria-label="Toggle Fullscreen" id="toggleFullscreenBtn" class="gov-icon-btn" title="Toggle Fullscreen">
             <i class="fa-solid fa-expand"></i>
           </button>
 
-          <button id="openSettingsBtn" class="gov-icon-btn" title="Settings">
+          <button aria-label="Settings" id="openSettingsBtn" class="gov-icon-btn" title="Settings">
             <i class="fa-solid fa-sliders"></i>
           </button>
 
@@ -199,16 +203,16 @@
           
           <!-- Voice Language Selector Pills -->
           <div class="voice-lang-bar" id="voiceLangBar">
-            <button class="voice-lang-btn active" data-lang="hi-IN" title="हिन्दी में बोलें">
+            <button aria-label="हिन्दी में बोलें" class="voice-lang-btn active" data-lang="hi-IN" title="हिन्दी में बोलें">
               🇮🇳 हिन्दी
             </button>
-            <button class="voice-lang-btn" data-lang="mr-IN" title="मराठीत बोला">
+            <button aria-label="मराठीत बोला" class="voice-lang-btn" data-lang="mr-IN" title="मराठीत बोला">
               🇮🇳 मराठी
             </button>
-            <button class="voice-lang-btn" data-lang="gu-IN" title="ગુજરાતીમાં બોલો">
+            <button aria-label="ગુજરાતીમાં બોલો" class="voice-lang-btn" data-lang="gu-IN" title="ગુજરાતીમાં બોલો">
               🇮🇳 ગુજરાતી
             </button>
-            <button class="voice-lang-btn" data-lang="en-IN" title="Speak in English">
+            <button aria-label="Speak in English" class="voice-lang-btn" data-lang="en-IN" title="Speak in English">
               🇬🇧 English
             </button>
           </div>
@@ -231,22 +235,22 @@
           <div class="chat-input-row">
             
             <!-- Push-to-Talk Mic Trigger -->
-            <button id="micBtn" class="btn-push-to-talk" title="Push to Talk (बोलें)">
+            <button aria-label="Push to Talk (बोलें)" id="micBtn" class="btn-push-to-talk" title="Push to Talk (बोलें)">
               <i class="fa-solid fa-microphone"></i>
               <span class="mic-lang-badge" id="micLangBadge" title="भाषा चक्र">HI</span>
             </button>
 
             <!-- Stop Ongoing Voice Button -->
-            <button id="stopVoiceBtn" class="btn-stop-voice" title="चलती आवाज़ रोकें (Stop Voice)" type="button">
+            <button aria-label="चलती आवाज़ रोकें (Stop Voice)" id="stopVoiceBtn" class="btn-stop-voice" title="चलती आवाज़ रोकें (Stop Voice)" type="button">
               <i class="fa-solid fa-circle-stop"></i>
               <span id="i18nStopVoice">रोकें</span>
             </button>
 
             <!-- Text Input -->
-            <input type="text" id="textInput" class="text-input-field" placeholder="या यहाँ अपना सवाल लिखें (Type in Hindi, Marathi, Gujarati, English)..." />
+            <input aria-label="या यहाँ अपना सवाल लिखें (Type in Hindi, Marathi, Gujarati, English)..." type="text" id="textInput" class="text-input-field" placeholder="या यहाँ अपना सवाल लिखें (Type in Hindi, Marathi, Gujarati, English)..." />
 
             <!-- Send Button -->
-            <button id="sendBtn" class="btn-send-text">
+            <button aria-label="sendBtn" id="sendBtn" class="btn-send-text">
               <i class="fa-solid fa-paper-plane"></i> <span id="i18nSendBtn">पूछें</span>
             </button>
 
@@ -265,7 +269,7 @@
         <div class="gov-card">
           <div class="card-title-row">
             <h3 id="i18nStatutoryTitle">
-              <i class="fa-solid fa-scale-balanced" style="color: #1a365d;"></i> वैधानिक प्राधिकार (Statutory Authority)
+              <i class="fa-solid fa-scale-balanced" style="color: var(--text-heading);"></i> वैधानिक प्राधिकार (Statutory Authority)
             </h3>
             <span class="badge-official">GOI राजपत्र</span>
           </div>
@@ -284,7 +288,7 @@
             <h4>
               <i class="fa-solid fa-layer-group" style="color: #15803d;"></i> त्वरित नागरिक सेवाएं व सत्यापन
             </h4>
-            <span class="badge-official" style="color: #15803d; background: #f0fdf4;">सक्रिय सेवाएं</span>
+            <span class="badge-official" style="color: #15803d; background: var(--gov-emerald-subtle);">सक्रिय सेवाएं</span>
           </div>
           
           <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 6px;">
@@ -295,12 +299,12 @@
                 <span class="service-subcard-title">
                   <i class="fa-solid fa-calculator" style="color: #15803d;"></i> KCC 4% ब्याज छूट
                 </span>
-                <span class="service-subcard-badge" style="color: #15803d; background: #dcfce7;">शुद्ध दर 4%</span>
+                <span class="service-subcard-badge" style="color: #15803d; background: var(--gov-emerald-subtle);">शुद्ध दर 4%</span>
               </div>
               <p class="service-subcard-desc">
                 समय पर ऋण चुकाने पर 3% सरकारी छूट। अपनी वास्तविक बचत तुरंत गणना करें।
               </p>
-              <button id="openKccCalcBtn" class="btn-card-action emerald" title="KCC 4% Subsidized Loan & Benefit Calculator">
+              <button aria-label="KCC 4% Subsidized Loan & Benefit Calculator" id="openKccCalcBtn" class="btn-card-action emerald" title="KCC 4% Subsidized Loan & Benefit Calculator">
                 <i class="fa-solid fa-calculator"></i> <span id="i18nKccCalc">KCC 4% कैलकुलेटर खोलें</span>
               </button>
             </div>
@@ -309,14 +313,14 @@
             <div class="service-subcard">
               <div class="service-subcard-header">
                 <span class="service-subcard-title">
-                  <i class="fa-solid fa-fingerprint" style="color: #1a365d;"></i> किसान बायोमेट्रिक
+                  <i class="fa-solid fa-fingerprint" style="color: var(--text-heading);"></i> किसान बायोमेट्रिक
                 </span>
-                <span class="service-subcard-badge" style="color: #1a365d; background: #ebf2fa;">UIDAI आधार</span>
+                <span class="service-subcard-badge" style="color: var(--text-heading); background: var(--gov-navy-subtle);">UIDAI आधार</span>
               </div>
               <p class="service-subcard-desc">
                 अंगूठा स्कैन करके अपने पैक्स खाते, KCC ऋण सीमा व फसल बीमा दावों की स्थिति जांचें।
               </p>
-              <button id="biometricBtn" class="btn-card-action" title="Farmer Biometric Login">
+              <button aria-label="Farmer Biometric Login" id="biometricBtn" class="btn-card-action" title="Farmer Biometric Login">
                 <i class="fa-solid fa-fingerprint" style="color: #15803d;"></i> <span id="i18nBiometric">अंगूठा स्कैन करें (Simulate)</span>
               </button>
 
@@ -327,7 +331,7 @@
                     <i class="fa-solid fa-user-check"></i>
                   </div>
                   <div>
-                    <h5 style="color: #0f172a; font-size: 0.94rem; margin: 0; font-weight: 700;" id="i18nFarmerName">रमेश कुमार (Ramesh Kumar)</h5>
+                    <h5 style="color: var(--text-primary); font-size: 0.94rem; margin: 0; font-weight: 700;" id="i18nFarmerName">रमेश कुमार (Ramesh Kumar)</h5>
                     <span style="font-size: 0.78rem; color: #15803d; font-weight: 600;" id="i18nFarmerBadge"><i class="fa-solid fa-shield-check"></i> आधार सत्यापित</span>
                   </div>
                 </div>
@@ -337,7 +341,7 @@
                   <div><strong>भूमि:</strong> 3.5 एकड़ (खसरा 142/8)</div>
                   <div><strong>दावा:</strong> PMFBY बीमा दावा लंबित (₹28,500)</div>
                 </div>
-                <button id="logoutFarmerBtn" style="margin-top: 10px; width: 100%; background: #e2e8f0; color: #334155; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.84rem; font-weight: 600; cursor: pointer;">
+                <button aria-label="logoutFarmerBtn" id="logoutFarmerBtn" style="margin-top: 10px; width: 100%; background: var(--bg-subtle); color: var(--text-secondary); border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.84rem; font-weight: 600; cursor: pointer;">
                   <i class="fa-solid fa-arrow-right-from-bracket"></i> <span id="i18nLogoutBtn">लॉगआउट करें</span>
                 </button>
               </div>
@@ -349,12 +353,12 @@
                 <span class="service-subcard-title">
                   <i class="fa-solid fa-file-invoice" style="color: #d97706;"></i> शिकायत पावती पर्ची
                 </span>
-                <span class="service-subcard-badge" style="color: #b45309; background: #fffbeb;">विधिक प्रमाण</span>
+                <span class="service-subcard-badge" style="color: #b45309; background: var(--gov-saffron-subtle);">विधिक प्रमाण</span>
               </div>
               <p class="service-subcard-desc">
                 कियोस्क से अपनी शिकायत या आवेदन की आधिकारिक पावती टोकन संख्या व क्यूआर कोड सहित प्राप्त करें।
               </p>
-              <button id="openReceiptBtn" class="btn-card-action" title="आधिकारिक शिकायत पावती देखें एवं प्रिंट करें">
+              <button aria-label="आधिकारिक शिकायत पावती देखें एवं प्रिंट करें" id="openReceiptBtn" class="btn-card-action" title="आधिकारिक शिकायत पावती देखें एवं प्रिंट करें">
                 <i class="fa-solid fa-print"></i> <span id="i18nReceipt">पावती पर्ची देखें / प्रिंट करें</span>
               </button>
             </div>
@@ -371,10 +375,10 @@
       <div class="footer-container">
         
         <div>
-          <div style="font-weight: 700; color: #1a365d; margin-bottom: 2px;">
+          <div style="font-weight: 700; color: var(--text-heading); margin-bottom: 2px;">
             सहकारिता मंत्रालय | भारत सरकार (Ministry of Cooperation, Government of India)
           </div>
-          <div style="font-size: 0.75rem; color: #64748b;">
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
             राष्ट्रीय सहकारी डेटाबेस व एआई विधिक मार्गदर्शन प्रणाली | नागरिक हेल्पलाइन: 1800-180-1551
           </div>
         </div>
@@ -384,7 +388,7 @@
             <i class="fa-solid fa-shield-check" style="color: #15803d;"></i> DPDP Act 2023
           </span>
           <span class="footer-tag">
-            <i class="fa-solid fa-microchip" style="color: #1a365d;"></i> Edge AI Node
+            <i class="fa-solid fa-microchip" style="color: var(--text-heading);"></i> Edge AI Node
           </span>
           <span class="footer-tag" id="i18nStatusSpeech">
             <i class="fa-solid fa-volume-high" style="color: #0284c7;"></i> Indic Speech Active
@@ -395,7 +399,7 @@
         </div>
 
       </div>
-      <div style="max-width: 1400px; margin: 12px auto 0 auto; text-align: center; font-size: 0.72rem; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+      <div style="max-width: 1400px; margin: 12px auto 0 auto; text-align: center; font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 10px;">
         © 2026 SAHAYAKBot | Smart India Hackathon 2026 (SIH26088). All Rights Reserved.
       </div>
     </footer>
@@ -411,25 +415,25 @@
     <div class="calc-modal-card">
       <div class="calc-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="background: #f0fdf4; color: #15803d; padding: 8px; border-radius: 8px; font-size: 1.1rem;">
+          <div style="background: var(--gov-emerald-subtle); color: #15803d; padding: 8px; border-radius: 8px; font-size: 1.1rem;">
             <i class="fa-solid fa-calculator"></i>
           </div>
           <div>
-            <h4 style="margin: 0; color: #1a365d; font-size: 0.96rem; font-weight: 700;">KCC 4% शुद्ध ब्याज व सब्सिडी कैलकुलेटर</h4>
-            <p style="margin: 2px 0 0 0; color: #64748b; font-size: 0.74rem;">भारत सरकार ब्याज छूट योजना (IS-PRI) एवं RBI दिशा-निर्देश</p>
+            <h4 style="margin: 0; color: var(--text-heading); font-size: 0.96rem; font-weight: 700;">KCC 4% शुद्ध ब्याज व सब्सिडी कैलकुलेटर</h4>
+            <p style="margin: 2px 0 0 0; color: var(--text-muted); font-size: 0.74rem;">भारत सरकार ब्याज छूट योजना (IS-PRI) एवं RBI दिशा-निर्देश</p>
           </div>
         </div>
-        <button class="btn-close-modal" id="closeKccCalcBtn">✕</button>
+        <button aria-label="closeKccCalcBtn" class="btn-close-modal" id="closeKccCalcBtn">✕</button>
       </div>
 
       <div class="calc-body">
         <div style="margin-bottom: 14px;">
-          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #334155; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;">
             <span>ऋण राशि (Loan Amount):</span>
-            <strong id="calcLoanValDisplay" style="color: #1a365d; font-size: 1.15rem; font-weight: 700;">₹ 1,50,000</strong>
+            <strong id="calcLoanValDisplay" style="color: var(--text-heading); font-size: 1.15rem; font-weight: 700;">₹ 1,50,000</strong>
           </div>
-          <input type="range" id="kccLoanRange" min="20000" max="300000" step="10000" value="150000" style="width: 100%; accent-color: #1a365d;" />
-          <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-top: 4px;">
+          <input aria-label="kccLoanRange" type="range" id="kccLoanRange" min="20000" max="300000" step="10000" value="150000" style="width: 100%; accent-color: var(--text-heading);" />
+          <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">
             <span>₹ 20,000</span>
             <span>₹ 1.6 लाख (कोलेटरल-मुक्त)</span>
             <span>₹ 3,00,000 (अधिकतम 4% सीमा)</span>
@@ -439,8 +443,8 @@
         <div class="calc-results-grid">
           <div class="calc-result-box">
             <div class="calc-res-label">सामान्य बैंक दर (Base)</div>
-            <div class="calc-res-val" style="color: #475569;">7.0%</div>
-            <div class="calc-res-sub" id="calcBaseInt" style="color: #64748b;">₹10,500 / वर्ष</div>
+            <div class="calc-res-val" style="color: var(--text-secondary);">7.0%</div>
+            <div class="calc-res-sub" id="calcBaseInt" style="color: var(--text-muted);">₹10,500 / वर्ष</div>
           </div>
 
           <div class="calc-result-box highlight-subvention">
@@ -451,24 +455,24 @@
 
           <div class="calc-result-box highlight-net">
             <div class="calc-res-label">किसान को शुद्ध ब्याज</div>
-            <div class="calc-res-val" style="color: #1a365d;">केवल 4.0%</div>
-            <div class="calc-res-sub" style="color: #1a365d;" id="calcNetInt">₹6,000 / वर्ष</div>
+            <div class="calc-res-val" style="color: var(--text-heading);">केवल 4.0%</div>
+            <div class="calc-res-sub" style="color: var(--text-heading);" id="calcNetInt">₹6,000 / वर्ष</div>
           </div>
         </div>
 
         <div class="calc-benefit-banner">
           <i class="fa-solid fa-circle-check" style="color: #15803d; font-size: 1.3rem;"></i>
-          <div style="font-size: 0.82rem; color: #1e293b;">
+          <div style="font-size: 0.82rem; color: var(--text-primary);">
             <strong>किसान की वार्षिक बचत: <span id="calcSavingsDisplay" style="color: #15803d; font-weight: 700;">₹4,500</span></strong><br>
-            <span style="font-size: 0.74rem; color: #64748b;">*समय पर ऋण चुकाने पर 3% शीघ्र पुनर्भुगतान प्रोत्साहन (PRI)</span>
+            <span style="font-size: 0.74rem; color: var(--text-muted);">*समय पर ऋण चुकाने पर 3% शीघ्र पुनर्भुगतान प्रोत्साहन (PRI)</span>
           </div>
         </div>
 
         <div style="display: flex; gap: 8px; margin-top: 14px;">
-          <button class="btn-send-text" id="kccPrintSummaryBtn" style="flex: 1; justify-content: center;">
+          <button aria-label="kccPrintSummaryBtn" class="btn-send-text" id="kccPrintSummaryBtn" style="flex: 1; justify-content: center;">
             <i class="fa-solid fa-print"></i> <span>पर्ची प्रिंट करें</span>
           </button>
-          <button class="btn-receipt-whatsapp" id="kccWhatsappSummaryBtn">
+          <button aria-label="kccWhatsappSummaryBtn" class="btn-receipt-whatsapp" id="kccWhatsappSummaryBtn">
             <i class="fa-brands fa-whatsapp"></i> <span>WhatsApp</span>
           </button>
         </div>
@@ -480,27 +484,27 @@
   <div class="modal-overlay" id="settingsModal">
     <div class="settings-modal-card" style="padding: 20px; max-width: 400px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <h4 style="margin: 0; color: #1a365d; font-size: 0.96rem; font-weight: 700;"><i class="fa-solid fa-sliders"></i> सिस्टम सेटिंग्स</h4>
-        <button class="btn-close-modal" id="closeSettingsBtn">✕</button>
+        <h4 style="margin: 0; color: var(--text-heading); font-size: 0.96rem; font-weight: 700;"><i class="fa-solid fa-sliders"></i> सिस्टम सेटिंग्स</h4>
+        <button aria-label="closeSettingsBtn" class="btn-close-modal" id="closeSettingsBtn">✕</button>
       </div>
       
       <div style="margin-bottom: 14px;">
-        <label style="font-size: 0.82rem; color: #334155; font-weight: 600; display: block; margin-bottom: 4px;">
+        <label style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 600; display: block; margin-bottom: 4px;">
           Google Gemini API Key (वैकल्पिक / Optional):
         </label>
-        <input type="password" id="geminiApiKeyInput" class="text-input-field" style="width: 100%; border-radius: 6px; padding: 8px 12px;" placeholder="AIzaSy..." />
-        <p style="font-size: 0.72rem; color: #64748b; margin-top: 4px;">
+        <input aria-label="AIzaSy..." type="password" id="geminiApiKeyInput" class="text-input-field" style="width: 100%; border-radius: 6px; padding: 8px 12px;" placeholder="AIzaSy..." />
+        <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">
           * इन-बिल्ट LLaMA-3.2 NIM AI व PACS विधिक डेटाबेस सक्रिय है।
         </p>
       </div>
 
       <div style="margin-bottom: 18px;">
-        <label style="font-size: 0.82rem; color: #334155; font-weight: 600; display: block; margin-bottom: 4px;">आवाज की गति (Speech Speed):</label>
-        <input type="range" id="speechRateRange" min="0.7" max="1.3" step="0.1" value="1.0" style="width: 100%; accent-color: #1a365d;">
+        <label style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 600; display: block; margin-bottom: 4px;">आवाज की गति (Speech Speed):</label>
+        <input aria-label="speechRateRange" type="range" id="speechRateRange" min="0.7" max="1.3" step="0.1" value="1.0" style="width: 100%; accent-color: var(--text-heading);">
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 8px;">
-        <button class="btn-send-text" id="saveSettingsBtn" style="padding: 7px 16px; font-size: 0.82rem;">सेव करें</button>
+        <button aria-label="saveSettingsBtn" class="btn-send-text" id="saveSettingsBtn" style="padding: 7px 16px; font-size: 0.82rem;">सेव करें</button>
       </div>
     </div>
   </div>
@@ -510,15 +514,15 @@
     <div class="scanner-card">
       <div class="calc-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="background: #f0fdf4; color: #15803d; padding: 8px; border-radius: 8px; font-size: 1.1rem;">
+          <div style="background: var(--gov-emerald-subtle); color: #15803d; padding: 8px; border-radius: 8px; font-size: 1.1rem;">
             <i class="fa-solid fa-fingerprint"></i>
           </div>
           <div>
-            <h4 style="margin: 0; color: #1a365d; font-size: 0.96rem; font-weight: 700;">किसान बायोमेट्रिक प्रमाणीकरण</h4>
-            <p style="margin: 2px 0 0 0; color: #64748b; font-size: 0.74rem;">सहकारिता मंत्रालय (GOI) - आधार / PACS सदस्य सत्यापन</p>
+            <h4 style="margin: 0; color: var(--text-heading); font-size: 0.96rem; font-weight: 700;">किसान बायोमेट्रिक प्रमाणीकरण</h4>
+            <p style="margin: 2px 0 0 0; color: var(--text-muted); font-size: 0.74rem;">सहकारिता मंत्रालय (GOI) - आधार / PACS सदस्य सत्यापन</p>
           </div>
         </div>
-        <button class="btn-close-modal" id="closeBiometricBtn">✕</button>
+        <button aria-label="closeBiometricBtn" class="btn-close-modal" id="closeBiometricBtn">✕</button>
       </div>
 
       <div class="calc-body" style="text-align: center;">
@@ -532,7 +536,7 @@
         </div>
 
         <div style="display: flex; gap: 8px; justify-content: center; margin-top: 16px;">
-          <button class="btn-send-text" id="triggerScanBtn">
+          <button aria-label="triggerScanBtn" class="btn-send-text" id="triggerScanBtn">
             <i class="fa-solid fa-hand"></i> <span>अंगूठा स्कैन करें (Simulate)</span>
           </button>
         </div>
@@ -542,43 +546,43 @@
 
   <!-- 4. Formal Grievance Acknowledgement Slip Modal -->
   <div class="modal-overlay" id="receiptModal">
-    <div class="scanner-card" style="max-width: 500px; background: #ffffff; color: #1e293b; border: 1.5px solid #1a365d; border-radius: 12px; overflow: hidden; padding: 0;">
+    <div class="scanner-card" style="max-width: 500px; background: var(--bg-card); color: var(--text-primary); border: 1.5px solid var(--border-card); border-radius: 12px; overflow: hidden; padding: 0;">
       <div style="background: #1a365d; color: white; padding: 14px 18px; text-align: center;">
         <div style="font-size: 1.05rem; font-weight: 700;">सहकारिता मंत्रालय, भारत सरकार</div>
         <div style="font-size: 0.78rem; opacity: 0.9;">Ministry of Cooperation | शिकायत निवारण व विधिक पावती</div>
       </div>
       <div style="padding: 18px; font-size: 0.86rem;">
-        <div style="text-align: center; font-weight: 700; color: #1a365d; margin-bottom: 12px; font-size: 0.95rem;">
+        <div style="text-align: center; font-weight: 700; color: var(--text-heading); margin-bottom: 12px; font-size: 0.95rem;">
           आधिकारिक पावती पर्ची (Formal Legal Acknowledgement Slip)
         </div>
         <table style="width: 100%; border-collapse: collapse;">
           <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 7px 4px; font-weight: 600; color: #475569; width: 42%;">पावती संदर्भ संख्या:</td>
+            <td style="padding: 7px 4px; font-weight: 600; color: var(--text-secondary); width: 42%;">पावती संदर्भ संख्या:</td>
             <td id="slipToken" style="padding: 7px 4px; font-weight: 700; color: #b45309;">MOC-2026-4891</td>
           </tr>
           <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">आवेदक / सदस्य नाम:</td>
+            <td style="padding: 7px 4px; font-weight: 600; color: var(--text-secondary);">आवेदक / सदस्य नाम:</td>
             <td id="slipCitizen" style="padding: 7px 4px; font-weight: 600;">राम सिंह (सदस्य सं. 402)</td>
           </tr>
           <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">संबद्ध पैक्स (PACS):</td>
+            <td style="padding: 7px 4px; font-weight: 600; color: var(--text-secondary);">संबद्ध पैक्स (PACS):</td>
             <td id="slipPacs" style="padding: 7px 4px;">सोनीपत प्राथमिक कृषि साख समिति (PACS)</td>
           </tr>
           <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">विषय / कानूनी मामला:</td>
+            <td style="padding: 7px 4px; font-weight: 600; color: var(--text-secondary);">विषय / कानूनी मामला:</td>
             <td id="slipCategory" style="padding: 7px 4px; font-weight: 600;">पैक्स सदस्यता अधिकार व उप-नियम</td>
           </tr>
           <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">वैधानिक आधार:</td>
+            <td style="padding: 7px 4px; font-weight: 600; color: var(--text-secondary);">वैधानिक आधार:</td>
             <td id="slipStatute" style="padding: 7px 4px; color: #15803d; font-weight: 700;">मॉडल उप-नियम 2023, धारा 7</td>
           </tr>
           <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 7px 4px; font-weight: 600; color: #475569;">समय-सीमा (SLA):</td>
+            <td style="padding: 7px 4px; font-weight: 600; color: var(--text-secondary);">समय-सीमा (SLA):</td>
             <td style="padding: 7px 4px; color: #dc2626; font-weight: 700;">30 कार्य दिवस (ARCS वैधानिक आदेश)</td>
           </tr>
         </table>
 
-        <div style="text-align: center; margin: 14px 0; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1;">
+        <div style="text-align: center; margin: 14px 0; padding: 10px; background: var(--bg-page); border-radius: 8px; border: 1px dashed var(--border-light);">
           <svg width="76" height="76" viewBox="0 0 100 100">
             <rect width="100" height="100" fill="#ffffff" />
             <rect x="10" y="10" width="25" height="25" fill="#1a365d" />
@@ -592,26 +596,27 @@
             <rect x="70" y="45" width="18" height="18" fill="#1a365d" />
             <rect x="45" y="70" width="20" height="20" fill="#1a365d" />
           </svg>
-          <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px; font-weight: 600;">
+          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
             सत्यापन क्यूआर कोड (National Cooperative Grievance Portal)
           </div>
         </div>
       </div>
-      <div style="display: flex; gap: 8px; padding: 12px 18px; background: #f8fafc; border-top: 1px solid #e2e8f0;">
-        <button class="btn-send-text" id="printSlipBtn" style="flex: 1; justify-content: center;" onclick="window.print()">
+      <div style="display: flex; gap: 8px; padding: 12px 18px; background: var(--bg-page); border-top: 1px solid var(--border-light);">
+        <button aria-label="printSlipBtn" class="btn-send-text" id="printSlipBtn" style="flex: 1; justify-content: center;" onclick="window.print()">
           <i class="fa-solid fa-print"></i> <span id="i18nSlipPrint">प्रिंट / PDF सेव करें</span>
         </button>
-        <button class="btn-receipt-whatsapp" id="whatsappSlipBtn">
+        <button aria-label="whatsappSlipBtn" class="btn-receipt-whatsapp" id="whatsappSlipBtn">
           <i class="fa-brands fa-whatsapp"></i> <span id="i18nSlipWa">WhatsApp</span>
         </button>
-        <button class="btn-close-modal" id="closeReceiptBtn"><span id="i18nSlipClose">✕</span></button>
+        <button aria-label="closeReceiptBtn" class="btn-close-modal" id="closeReceiptBtn"><span id="i18nSlipClose">✕</span></button>
       </div>
     </div>
   </div>
 
-  <script src="app.js?v=3.3"></script>
+  <script src="app.js?v=3.5"></script>
+  
   <script>
-    // PWA Service Worker Registration & Live Cache Purge
+    // Offline Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js?v=3.3')

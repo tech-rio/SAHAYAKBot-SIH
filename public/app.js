@@ -5,7 +5,6 @@ let isRecording = false;
 let recognition = null;
 let currentLanguage = 'hi-IN';
 let speechRate = 1.0;
-let geminiApiKey = localStorage.getItem('sahakar_gemini_key') || '';
 let availableVoices = [];
 let hindiVoice = null;
 let currentAudio = null;
@@ -14,6 +13,22 @@ let voiceSessionId = 0;
 let activeSpeechBubbleBtn = null;
 
 // DOM Elements
+const darkModeToggle = document.getElementById('darkModeToggle');
+if (darkModeToggle) {
+  darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    darkModeToggle.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+
+  // Load saved theme
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    darkModeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+  }
+}
+
 const chatContainer = document.getElementById('chatContainer');
 const micBtn = document.getElementById('micBtn');
 const stopVoiceBtn = document.getElementById('stopVoiceBtn');
@@ -36,7 +51,6 @@ const settingsModal = document.getElementById('settingsModal');
 const openSettingsBtn = document.getElementById('openSettingsBtn');
 const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
 const speechRateRange = document.getElementById('speechRateRange');
 
 // Omnichannel View Mode Buttons
@@ -556,6 +570,7 @@ function detectAndSwitchVoiceLanguage(rawTranscript) {
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
+  loadChatHistory();
   await loadKnowledgeBase();
   initVoices();
   initSpeechRecognition();
@@ -565,9 +580,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupKccCalculator();
   applyGlobalLanguage(currentLanguage);
 
-  if (geminiApiKey) {
-    geminiApiKeyInput.value = geminiApiKey;
-  }
 });
 
 // Load Voices properly
@@ -790,8 +802,6 @@ function setupEventListeners() {
   }
 
   saveSettingsBtn.addEventListener('click', () => {
-    geminiApiKey = geminiApiKeyInput.value.trim();
-    localStorage.setItem('sahakar_gemini_key', geminiApiKey);
     speechRate = parseFloat(speechRateRange.value);
     settingsModal.classList.remove('open');
     alert('सेटिंग्स सुरक्षित कर ली गईं! (Settings Saved)');
@@ -991,10 +1001,8 @@ async function handleUserQuery(query) {
   appendMessage(query, 'user');
   updateVoiceStatus(getLocalizedStatus('processing'));
 
-  // 1. Immediate client-side speaker language detection
   const detectedByClient = detectSpokenLanguage(query);
   if (detectedByClient && detectedByClient !== currentLanguage) {
-    console.log(`[Speaker Auto-Switch] Client detected ${detectedByClient}. Updating UI & speech model.`);
     applyGlobalLanguage(detectedByClient);
   }
 
@@ -1004,9 +1012,8 @@ async function handleUserQuery(query) {
 
   let botReply = '';
   let matchedDoc = null;
-  let sourceTag = 'LLaMA-3.2 AI';
+  let sourceTag = 'AI Assistant';
 
-  // 1. Try Backend LLaMA 3.2 AI with real-time Ministry Telemetry sync
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
@@ -1020,198 +1027,29 @@ async function handleUserQuery(query) {
     });
     if (res.ok) {
       const data = await res.json();
-      if (data.reply) {
-        botReply = data.reply;
-        sourceTag = data.source || 'LLaMA-3.2 AI';
-        if (data.matched_doc) {
-          matchedDoc = data.matched_doc;
-        }
-      }
-
-      // If backend detected a specific language from query:
+      if (data.reply) botReply = data.reply;
+      if (data.source) sourceTag = data.source;
+      if (data.matched_doc) matchedDoc = data.matched_doc;
       if (data.detected_lang) {
         const backendLangFull = data.detected_lang + '-IN';
         effectiveLangCode = data.detected_lang;
         if (currentLanguage !== backendLangFull) {
-          console.log(`[Speaker Auto-Switch] Backend detected ${backendLangFull}. Synchronizing dropdown & UI.`);
           applyGlobalLanguage(backendLangFull);
         }
       }
+    } else {
+       botReply = "Backend server error. Please try again later.";
     }
   } catch (err) {
-    console.warn('Backend AI fetch failed, trying fallbacks:', err);
-  }
-
-  // 2. Direct Gemini if key entered in settings
-  if (!botReply && geminiApiKey) {
-    try {
-      botReply = await callGeminiLLM(query, isHindiQuery);
-      sourceTag = 'Gemini AI';
-    } catch (err) {
-      console.warn('Gemini call failed:', err);
-    }
-  }
-
-  // 3. Fallback to local high-precision cooperative RAG with statutory citations
-  if (!botReply) {
-    const ragResult = queryLocalRAG(query, isHindiQuery, effectiveLangCode);
-    botReply = ragResult.reply;
-    matchedDoc = ragResult.doc;
-    sourceTag = 'Knowledge Base (Offline RAG)';
+    console.warn('Backend AI fetch failed:', err);
+    botReply = "Network error. Please try again later.";
   }
 
   appendMessage(botReply, 'bot', matchedDoc, query, sourceTag);
   updateVoiceStatus(getLocalizedStatus('ready'));
-
-  // Speak aloud in detected regional language matching the speaker
   speakAnswer(botReply, effectiveLangCode);
 }
-
-// Local RAG Matcher with multilingual statutory citations (Hindi, Marathi, Gujarati, English)
-function queryLocalRAG(userText, isHindi, langCode = 'hi') {
-  const lowerText = userText.toLowerCase();
-
-  let bestMatch = null;
-  let highestScore = 0;
-
-  for (const item of knowledgeBase) {
-    let score = 0;
-    for (const kw of item.keywords) {
-      if (lowerText.includes(kw.toLowerCase())) {
-        score += 3;
-      }
-    }
-    if (lowerText.includes(item.question_hi.toLowerCase()) || lowerText.includes(item.question_en.toLowerCase())) {
-      score += 6;
-    }
-
-    if (score > highestScore) {
-      highestScore = score;
-      bestMatch = item;
-    }
-  }
-
-  if (bestMatch && highestScore > 0) {
-    if (langCode === 'en') {
-      let reply = bestMatch.answer_en;
-      if (!reply.includes('Statutory Ref')) {
-        reply += '\n\n⚖️ Statutory Ref: Model Bye-Laws 2023 & Ministry of Cooperation Guidelines';
-      }
-      return { reply, doc: bestMatch };
-    } else if (langCode === 'mr') {
-      let reply = bestMatch.answer_hi
-        .replace(/है।/g, 'आहे.')
-        .replace(/सकते हैं/g, 'शकता.')
-        .replace(/किया जाता है/g, 'केले जाते.')
-        .replace(/मिलता है/g, 'मिळते.');
-      reply += '\n\n⚖️ वैधानिक संदर्भ: मॉडेल उप-नियम 2023 व सहकार मंत्रालय दिशा-निर्देश';
-      return { reply, doc: bestMatch };
-    } else if (langCode === 'gu') {
-      let reply = bestMatch.answer_hi
-        .replace(/है।/g, 'છે.')
-        .replace(/सकते हैं/g, 'શકો છો.')
-        .replace(/किया जाता है/g, 'કરવામાં આવે છે.')
-        .replace(/मिलता है/g, 'મળે છે.');
-      reply += '\n\n⚖️ કાનૂની સંદર્ભ: મોડેલ પેટાનિયમો 2023 અને સહકાર મંત્રાલય માર્ગદર્શિકા';
-      return { reply, doc: bestMatch };
-    } else {
-      let reply = bestMatch.answer_hi;
-      if (!reply.includes('वैधानिक संदर्भ')) {
-        reply += '\n\n⚖️ वैधानिक संदर्भ: मॉडल उप-नियम 2023 एवं सहकारिता मंत्रालय निर्देश';
-      }
-      return { reply, doc: bestMatch };
-    }
-  }
-
-  // General Regional Fallback
-  if (langCode === 'en') {
-    return {
-      reply: `According to Ministry of Cooperation guidelines:
-1. For PACS membership or agricultural credit, valid Aadhaar and local residence are mandatory.
-2. For crop damages or insurance, report within 72 hours via PACS or toll-free 14447.
-3. Timely repayment of KCC loans yields an effective net interest rate of only 4%.
-4. For dispute redressal, consult your local Assistant Registrar of Cooperative Societies (ARCS).
-
-⚖️ Statutory Ref: Model Bye-Laws 2023 (Clause 7) & RBI KCC Subvention Scheme`,
-      doc: null
-    };
-  } else if (langCode === 'mr') {
-    return {
-      reply: `सहकार मंत्रालय व PACS नियमांनुसार:
-1. कोणत्याही प्राथमिक कृषी पतसंस्थेत (PACS) सदस्यत्वासाठी आधार व स्थानिक रहिवासी असणे आवश्यक आहे.
-2. पीक नुकसानीसाठी 72 तासांच्या आत स्थानिक PACS किंवा 14447 वर माहिती नोंदवा.
-3. KCC कर्जावर वेळेत परतफेड केल्यास केवळ 4% निव्वळ व्याजदराचा लाभ मिळतो.
-4. अधिक माहितीसाठी जवळच्या सहायक निबंधक (ARCS) कार्यालयात संपर्क साधा.
-
-⚖️ वैधानिक संदर्भ: मॉडेल उप-नियम 2023 (कलम 7) व RBI KCC व्याज सवलत परिपत्रक`,
-      doc: null
-    };
-  } else if (langCode === 'gu') {
-    return {
-      reply: `સહકાર મંત્રાલય અને PACS નિયમો અનુસાર:
-1. કોઈપણ પ્રાથમિક કૃષિ સહકારી મંડળી (PACS) માં સભ્યપદ માટે આધાર અને સ્થાનિક રહેવાસી હોવું જરૂરી છે.
-2. પાક નુકસાન માટે 72 કલાકની અંદર સ્થાનિક PACS અથવા ટોલ-ફ્રી નંબર 14447 પર માહિતી નોંધાવો.
-3. KCC લોન પર સમયસર ચૂકવણી કરવાથી માત્ર 4% ચોખ્ખા વ્યાજદરનો લાભ મળે છે.
-4. વધુ માહિતી માટે તમારા નજીકના સહાયક રજિસ્ટ્રાર (ARCS) કચેરીનો સંપર્ક કરો.
-
-⚖️ કાનૂની સંદર્ભ: મોડેલ પેટાનિયમો 2023 (કલમ 7) અને RBI KCC વ્યાજ રાહત પરિપત્ર`,
-      doc: null
-    };
-  } else {
-    return {
-      reply: `सहकारिता मंत्रालय व PACS नियमों के अनुसार:
-1. किसी भी सहकारी समिति (PACS, दुग्ध, मत्स्य) में सदस्यता व ऋण के लिए वैध आधार व क्षेत्रीय निवास आवश्यक है।
-2. कृषि व फसल संबंधित क्षति के लिए 72 घंटे के भीतर स्थानीय PACS या टोल-फ्री नंबर 14447 पर सूचना दर्ज करें।
-3. KCC ऋण पर समय से भुगतान करने पर शुद्ध 4% ब्याज दर का लाभ मिलता है।
-4. अधिक जानकारी के लिए अपने नजदीकी ग्राम सेवक या सहायक निबंधक (ARCS) कार्यालय में संपर्क करें।
-
-⚖️ वैधानिक संदर्भ: मॉडल उप-नियम 2023 (धारा 7) एवं RBI KCC ब्याज छूट परिपत्र`,
-      doc: null
-    };
-  }
-}
-
-// Call Google Gemini API
-async function callGeminiLLM(prompt, isHindi) {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
-  
-  const targetLang = isHindi ? "HINDI" : "ENGLISH";
-  const systemInstruction = `You are 'SAHAYAKBot', an official AI Assistant for the Ministry of Cooperation, Government of India.
-CRITICAL: You MUST answer strictly in ${targetLang} language.
-Your domain:
-- Primary Agricultural Credit Societies (PACS) Model Bye-Laws 2023.
-- Kisan Credit Card (KCC) 4% subsidized interest rate rules.
-- Pradhan Mantri Fasal Bima Yojana (PMFBY) crop insurance and 72-hour claim window.
-- Multi-State Co-operative Societies (MSCS) Act 2023, Cooperative Ombudsman.
-- CRCS Sahara Refund Portal.
-Include a statutory reference at the end. Keep responses concise and structured in bullet points.`;
-
-  const payload = {
-    contents: [
-      {
-        role: "user",
-        parts: [
-          { text: `${systemInstruction}\n\nUser Question: ${prompt}` }
-        ]
-      }
-    ]
-  };
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  const data = await response.json();
-  if (data.candidates && data.candidates[0].content.parts[0].text) {
-    return data.candidates[0].content.parts[0].text;
-  }
-  throw new Error('Invalid response from Gemini');
-}
-
-// Append Chat Messages
-function appendMessage(text, sender, doc = null, originalQuery = '', sourceTag = 'LLaMA-3.2 AI') {
+function appendMessage(text, sender, doc = null, originalQuery = '', sourceTag = 'AI Assistant', isHistoryLoad = false) {
   const bubble = document.createElement('div');
   bubble.className = `message-bubble ${sender === 'user' ? 'user-msg' : 'bot-msg'}`;
 
@@ -1271,6 +1109,43 @@ function appendMessage(text, sender, doc = null, originalQuery = '', sourceTag =
       }
     };
 
+    // Feedback Buttons (Thumbs Up / Thumbs Down)
+    const feedbackUpBtn = document.createElement('button');
+    feedbackUpBtn.className = 'btn-receipt feedback-btn';
+    feedbackUpBtn.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>';
+    feedbackUpBtn.onclick = async () => {
+      feedbackUpBtn.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>';
+      feedbackDownBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
+      try {
+        await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating: 'up', query: originalQuery, response: text })
+        });
+      } catch (e) {
+        console.warn('Feedback failed:', e);
+      }
+    };
+
+    const feedbackDownBtn = document.createElement('button');
+    feedbackDownBtn.className = 'btn-receipt feedback-btn';
+    feedbackDownBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
+    feedbackDownBtn.onclick = async () => {
+      feedbackDownBtn.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>';
+      feedbackUpBtn.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>';
+      try {
+        await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating: 'down', query: originalQuery, response: text })
+        });
+      } catch (e) {
+        console.warn('Feedback failed:', e);
+      }
+    };
+
+    actionsRow.appendChild(feedbackUpBtn);
+    actionsRow.appendChild(feedbackDownBtn);
     actionsRow.appendChild(printBtn);
     actionsRow.appendChild(waBtn);
     actionsRow.appendChild(speakBtn);
@@ -1279,7 +1154,21 @@ function appendMessage(text, sender, doc = null, originalQuery = '', sourceTag =
 
   chatContainer.appendChild(bubble);
   chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  if (!isHistoryLoad) {
+    let history = JSON.parse(sessionStorage.getItem('chatHistory') || '[]');
+    history.push({ text, sender, doc, originalQuery, sourceTag });
+    sessionStorage.setItem('chatHistory', JSON.stringify(history));
+  }
 }
+
+function loadChatHistory() {
+  let history = JSON.parse(sessionStorage.getItem('chatHistory') || '[]');
+  history.forEach(msg => {
+    appendMessage(msg.text, msg.sender, msg.doc, msg.originalQuery, msg.sourceTag, true);
+  });
+}
+
 
 // Stop Ongoing Voice Playback (both HTML5 Audio and SpeechSynthesis)
 function stopVoice() {

@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./public:/app/public
+      - ./db:/app/db  # For SQLite / ChromaDB persistence
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    restart: unless-stopped

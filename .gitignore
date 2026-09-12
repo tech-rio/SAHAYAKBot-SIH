@@ -11,6 +11,7 @@ __pycache__/
 # Environment & local secret keys
 .env
 .env.local
+.env.production
 
 # Logs
 *.log
@@ -21,3 +22,34 @@ ehthumbs.db
 
 # Cloudflare Tunnel credentials / temp logs
 .cloudflared/
+
+# Tool binaries — do NOT commit executables
+tools/cloudflared.exe
+tools/*.exe
+
+# ChromaDB vector store (generated locally)
+chroma_db/
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Desktop.ini
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# TTS audio cache
+tts_cache/

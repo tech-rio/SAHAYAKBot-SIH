@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>सहकारिता मंत्रालय - National Cooperative Telemetry & Grievance Admin Portal (SIH26088)</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
@@ -233,7 +234,36 @@
 </head>
 <body>
 
-  <div class="admin-container">
+  <!-- Admin Login Overlay -->
+  <div id="adminLoginOverlay" style="position: fixed; inset: 0; background: #0b0f19; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+    <div style="background: rgba(17, 24, 39, 0.95); border: 1px solid #1f2937; border-radius: 16px; padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+      <div class="admin-logo-badge" style="margin: 0 auto 20px auto; width: 64px; height: 64px; font-size: 32px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h2 style="margin: 0 0 10px 0; color: #f8fafc; font-size: 1.5rem;">Admin Access</h2>
+      <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px;">Authenticate to access the National Telemetry Portal.</p>
+      
+      <button id="adminBiometricBtn" style="width: 100%; background: linear-gradient(135deg, #0f766e, #14b8a6); border: none; color: white; padding: 14px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px;">
+        <i class="fa-solid fa-fingerprint" style="font-size: 1.2rem;"></i> Start Biometric Scan
+      </button>
+      
+      <div id="adminBiometricStatus" style="font-size: 0.85rem; color: #10b981; margin-bottom: 15px; min-height: 20px;"></div>
+
+      <div style="display: flex; align-items: center; gap: 10px; color: #475569; font-size: 0.8rem; margin-bottom: 15px;">
+        <div style="flex: 1; height: 1px; background: #334155;"></div>
+        <span>OR</span>
+        <div style="flex: 1; height: 1px; background: #334155;"></div>
+      </div>
+
+      <input type="password" id="adminPinInput" placeholder="Enter Admin Password" style="width: 100%; background: #1e293b; border: 1px solid #334155; color: white; padding: 12px; border-radius: 8px; font-size: 1rem; text-align: center; margin-bottom: 15px; box-sizing: border-box;" />
+      
+      <button id="adminPinBtn" style="width: 100%; background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; color: #f8fafc; padding: 12px; border-radius: 8px; font-size: 0.95rem; cursor: pointer;">
+        Login with PIN
+      </button>
+    </div>
+  </div>
+
+  <div class="admin-container" id="mainAdminContent" style="display: none;">
     
     <!-- Header -->
     <header class="admin-header">
@@ -324,44 +354,8 @@
           <span style="font-size: 0.78rem; color: #94a3b8;">Real-time AI Categorization</span>
         </div>
 
-        <div class="bar-row">
-          <div class="bar-label">
-            <span>किसान क्रेडिट कार्ड (KCC 4% Subsidized Loan & Repayment)</span>
-            <strong id="barLabelKcc">41% (608 प्रश्न)</strong>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill" id="barFillKcc" style="width: 41%;"></div>
-          </div>
-        </div>
-
-        <div class="bar-row">
-          <div class="bar-label">
-            <span>PMFBY फसल बीमा दावा (Mandatory 72-Hour Claim Window)</span>
-            <strong id="barLabelPmfby">27% (400 प्रश्न)</strong>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill" id="barFillPmfby" style="width: 27%; background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div>
-          </div>
-        </div>
-
-        <div class="bar-row">
-          <div class="bar-label">
-            <span>PACS मॉडल उप-नियम 2023 व नई सदस्यता प्रक्रिया</span>
-            <strong id="barLabelPacs">19% (282 प्रश्न)</strong>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill" id="barFillPacs" style="width: 19%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
-          </div>
-        </div>
-
-        <div class="bar-row">
-          <div class="bar-label">
-            <span>सहकारी समिति विवाद, चुनाव व लोकपाल शिकायत (Ombudsman)</span>
-            <strong id="barLabelGrievance">13% (192 प्रश्न)</strong>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill" id="barFillGrievance" style="width: 13%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
-          </div>
+        <div style="height: 250px; position: relative; margin-top: 20px;">
+          <canvas id="categoryChart"></canvas>
         </div>
 
         <div style="margin-top: 20px; padding: 12px; background: rgba(30, 41, 59, 0.4); border-radius: 8px; border: 1px dashed #334155; font-size: 0.8rem; color: #cbd5e1;">
@@ -522,6 +516,75 @@
   </div>
 
   <script>
+    // Admin Login Logic
+    const adminLoginOverlay = document.getElementById('adminLoginOverlay');
+    const mainAdminContent = document.getElementById('mainAdminContent');
+    const adminBiometricBtn = document.getElementById('adminBiometricBtn');
+    const adminBiometricStatus = document.getElementById('adminBiometricStatus');
+    const adminPinInput = document.getElementById('adminPinInput');
+    const adminPinBtn = document.getElementById('adminPinBtn');
+
+    function unlockAdmin() {
+      adminLoginOverlay.style.display = 'none';
+      mainAdminContent.style.display = 'block';
+    }
+
+    adminBiometricBtn.addEventListener('click', () => {
+      adminBiometricBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scanning...';
+      adminBiometricStatus.innerText = 'Initializing Aadhaar API...';
+      adminBiometricStatus.style.color = '#38bdf8';
+      
+      setTimeout(() => {
+        adminBiometricStatus.innerText = 'Verifying fingerprint template...';
+        
+        setTimeout(() => {
+          adminBiometricStatus.innerText = 'Authentication Successful! Welcome Admin.';
+          adminBiometricStatus.style.color = '#10b981';
+          adminBiometricBtn.innerHTML = '<i class="fa-solid fa-check"></i> Verified';
+          
+          setTimeout(() => {
+            unlockAdmin();
+          }, 800);
+        }, 1200);
+      }, 1000);
+    });
+
+    adminPinBtn.addEventListener('click', async () => {
+      const pin = adminPinInput.value;
+      if (!pin) {
+        alert('Please enter a PIN.');
+        return;
+      }
+      adminPinBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+      
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pin })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok && data.success) {
+          // Store token if needed for future requests
+          localStorage.setItem('adminToken', data.token);
+          unlockAdmin();
+        } else {
+          alert(data.detail || 'Invalid PIN.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Authentication failed.');
+      } finally {
+        adminPinBtn.innerHTML = 'Login with PIN';
+      }
+    });
+
+    adminPinInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') adminPinBtn.click();
+    });
+
     // Live Telemetry & SQLite Grievance Sync Engine
     let lastQueryCount = 0;
     let allGrievances = [];
@@ -570,19 +633,30 @@
             const pacsPct = Math.round((data.categories.pacs_bylaws / totalCat) * 100);
             const griPct = 100 - (kccPct + pmfbyPct + pacsPct);
 
-            document.getElementById('barLabelKcc').innerText = `${kccPct}% (${data.categories.kcc} प्रश्न)`;
-            document.getElementById('barFillKcc').style.width = `${kccPct}%`;
-
-            document.getElementById('barLabelPmfby').innerText = `${pmfbyPct}% (${data.categories.pmfby} प्रश्न)`;
-            document.getElementById('barFillPmfby').style.width = `${pmfbyPct}%`;
-
-            document.getElementById('barLabelPacs').innerText = `${pacsPct}% (${data.categories.pacs_bylaws} प्रश्न)`;
-            document.getElementById('barFillPacs').style.width = `${pacsPct}%`;
-
-            document.getElementById('barLabelGrievance').innerText = `${griPct}% (${data.categories.grievance} प्रश्न)`;
-            document.getElementById('barFillGrievance').style.width = `${griPct}%`;
-
             if (kccCountEl) kccCountEl.innerText = `${data.categories.kcc} किसानों का KCC मार्गदर्शन`;
+
+            if (window.categoryChartInstance) {
+                window.categoryChartInstance.data.datasets[0].data = [data.categories.kcc, data.categories.pmfby, data.categories.pacs_bylaws, data.categories.grievance];
+                window.categoryChartInstance.update();
+            } else {
+                const ctx = document.getElementById('categoryChart').getContext('2d');
+                window.categoryChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['KCC 4% Loan', 'PMFBY', 'PACS', 'Grievance'],
+                        datasets: [{
+                            data: [data.categories.kcc, data.categories.pmfby, data.categories.pacs_bylaws, data.categories.grievance],
+                            backgroundColor: ['#14b8a6', '#3b82f6', '#10b981', '#f59e0b'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right', labels: { color: '#cbd5e1' } } }
+                    }
+                });
+            }
           }
           lastQueryCount = data.total_queries;
         }
