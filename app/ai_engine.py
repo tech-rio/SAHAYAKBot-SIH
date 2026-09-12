@@ -87,7 +87,7 @@ def _call_nvidia_nim(query: str, lang: str, rag_context: str) -> Optional[str]:
     }
 
     try:
-        resp = requests.post(NVIDIA_ENDPOINT, headers=headers, json=payload, timeout=22)
+        resp = requests.post(NVIDIA_ENDPOINT, headers=headers, json=payload, timeout=120)
         if resp.status_code == 200:
             content = resp.json()["choices"][0]["message"]["content"]
             return content.strip()
@@ -125,7 +125,7 @@ def _call_gemini(query: str, lang: str, rag_context: str) -> Optional[str]:
     }
 
     try:
-        resp = requests.post(endpoint, json=payload, timeout=22, headers={"Content-Type": "application/json"})
+        resp = requests.post(endpoint, json=payload, timeout=120, headers={"Content-Type": "application/json"})
         if resp.status_code == 200:
             data = resp.json()
             if data.get("candidates") and data["candidates"][0].get("content", {}).get("parts"):
