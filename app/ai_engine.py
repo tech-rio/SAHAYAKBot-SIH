@@ -29,7 +29,7 @@ def query_ai(user_query: str, lang: str = "hi") -> dict:
     ai_reply = None
     source = "fallback"
 
-    if NVIDIA_API_KEY:
+    if NVIDIA_API_KEY and NVIDIA_API_KEY != "your-nvidia-api-key-here":
         ai_reply = _call_nvidia_nim(user_query, detected_lang, rag_context)
         if ai_reply:
             source = f"LLaMA-3.2 (NVIDIA NIM + RAG:{search_method})" if matched_doc else "LLaMA-3.2 (NVIDIA NIM)"
