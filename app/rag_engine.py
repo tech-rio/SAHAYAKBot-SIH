@@ -170,7 +170,7 @@ def get_rag_context_text(matched_doc: dict) -> str:
         f"Topic: {matched_doc['question_en']} / {matched_doc['question_hi']}\n"
         f"Key Provisions (English):\n{matched_doc['answer_en']}\n"
         f"Key Provisions (Hindi):\n{matched_doc['answer_hi']}\n"
-        f"CRITICAL INSTRUCTION: Ground your answer strictly in these verified facts. "
-        f"Cite the exact statutory reference given above.\n"
+        f"INSTRUCTION: If this official scheme context directly answers the user's question, use it as your primary source. "
+        f"However, if the user is asking a general farming question (e.g., about crops, soil, or general agricultural advice) that is NOT fully answered by this scheme, use your expert agricultural knowledge to directly answer their specific question accurately, and optionally mention this scheme if it is relevant.\n"
         f"----------------------------------------------------------"
     )
