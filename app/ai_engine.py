@@ -43,10 +43,13 @@ def query_ai(user_query: str, lang: str = "hi") -> dict:
     # If AI failed but RAG matched, use RAG directly
     if not ai_reply and matched_doc:
         if detected_lang == "en":
-            ai_reply = matched_doc["answer_en"]
+            ai_reply = matched_doc["answer_en"] + "\n\n(Note: AI generation failed, showing exact knowledge base match)"
         else:
-            ai_reply = matched_doc["answer_hi"]
+            ai_reply = matched_doc["answer_hi"] + "\n\n(Note: AI generation failed, showing exact knowledge base match)"
         source = f"Ministry Knowledge Base (RAG:{search_method}, id:{matched_doc['id']})"
+    elif not ai_reply:
+        ai_reply = "AI systems are currently unavailable. Please try again later."
+        source = "Error"
 
     return {
         "reply": ai_reply,
@@ -89,10 +92,14 @@ def _call_nvidia_nim(query: str, lang: str, rag_context: str) -> Optional[str]:
             content = resp.json()["choices"][0]["message"]["content"]
             return content.strip()
         else:
-            print(f"[AI Error] NVIDIA NIM status {resp.status_code}: {resp.text[:200]}")
+            err_msg = f"[AI Error] NVIDIA NIM status {resp.status_code}: {resp.text[:200]}"
+            print(err_msg)
+            with open("scratch/ai_error.log", "a") as f: f.write(err_msg + "\n")
             return None
     except Exception as e:
-        print(f"[AI Error] NVIDIA NIM connection error: {e}")
+        err_msg = f"[AI Error] NVIDIA NIM connection error: {e}"
+        print(err_msg)
+        with open("scratch/ai_error.log", "a") as f: f.write(err_msg + "\n")
         return None
 
 
@@ -101,7 +108,7 @@ def _call_gemini(query: str, lang: str, rag_context: str) -> Optional[str]:
     lang_config = get_lang_config(lang)
     lang_name = {"hi": "HINDI", "mr": "MARATHI", "gu": "GUJARATI", "en": "ENGLISH"}.get(lang, "HINDI")
 
-    endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+    endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
 
     system_text = (
         f"{SYSTEM_PROMPT}\n\n"
@@ -124,8 +131,12 @@ def _call_gemini(query: str, lang: str, rag_context: str) -> Optional[str]:
             if data.get("candidates") and data["candidates"][0].get("content", {}).get("parts"):
                 return data["candidates"][0]["content"]["parts"][0]["text"].strip()
         else:
-            print(f"[AI Error] Gemini status {resp.status_code}: {resp.text[:200]}")
+            err_msg = f"[AI Error] Gemini status {resp.status_code}: {resp.text[:200]}"
+            print(err_msg)
+            with open("scratch/ai_error.log", "a") as f: f.write(err_msg + "\n")
         return None
     except Exception as e:
-        print(f"[AI Error] Gemini connection error: {e}")
+        err_msg = f"[AI Error] Gemini connection error: {e}"
+        print(err_msg)
+        with open("scratch/ai_error.log", "a") as f: f.write(err_msg + "\n")
         return None
